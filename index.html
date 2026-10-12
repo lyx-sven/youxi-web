@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>像素回合制战斗 - YOUXI (网页版)</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;overflow-x:hidden;-webkit-text-size-adjust:100%}
+#app{max-width:680px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;align-items:center;background:#1c202c}
+.screen{width:100%;display:none;flex-direction:column;align-items:center;padding:12px}
+.screen.active{display:flex}
+.title{color:#ffdc78;font-size:34px;margin-top:56px;font-weight:bold;letter-spacing:4px;text-align:center}
+.subtitle{color:#96a0be;font-size:18px;margin:8px 0 44px;letter-spacing:10px}
+.menu-btn{width:240px;height:58px;margin:10px;background:#3c5a8c;color:#fff;font-size:22px;border:none;cursor:pointer;font-family:inherit;letter-spacing:6px}
+.menu-btn:hover{background:#46679e}
+.menu-btn:active{background:#2b4470}
+.cards{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;width:100%}
+.card{background:#32384a;flex:1 1 150px;min-width:140px;max-width:210px;padding:10px 8px;cursor:pointer;text-align:center;border:2px solid #32384a}
+.card:hover{border-color:#ffdc78}
+.card:active{background:#4a5268}
+.card canvas{image-rendering:pixelated;background:#0005;display:block;margin:0 auto;width:140px;height:140px}
+.card-name{color:#fff;font-size:22px;margin-top:6px;font-weight:bold}
+.card-sub{color:#96a0be;font-size:12px;margin-top:2px}
+#screen-playing{width:100%;align-items:center}
+#topbar{width:100%;max-width:625px;background:#2a2e3c;padding:6px 10px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;position:relative}
+#stat-hp{color:#ffe650;font-weight:bold;font-size:22px;line-height:1.4}
+#info-line1{color:#e6ebf5;font-size:15px;line-height:1.4}
+#info-line2{color:#96a0be;font-size:13px;width:100%;line-height:1.4}
+#btn-menu{margin-left:auto;background:#4a5268;color:#fff;border:none;padding:6px 14px;font-family:inherit;font-size:14px;cursor:pointer}
+#btn-menu:active{background:#3a4152}
+#canvas-wrap{width:100%;max-width:625px;background:#141820;padding:8px}
+#game{width:100%;height:auto;display:block;image-rendering:pixelated;touch-action:manipulation;cursor:pointer}
+#battle-status{width:100%;max-width:625px;background:#282e3c;padding:8px 12px;font-size:20px;line-height:1.8;display:none;color:#ebf0fa}
+#battle-status .bs-title{color:#ffdc78;font-size:14px;text-align:center}
+#battle-status .bs-player{color:#ffe650;font-weight:bold;font-size:22px}
+#battle-menu{width:100%;max-width:625px;display:none;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 0}
+#battle-menu.active{display:grid}
+#battle-menu button{height:54px;font-size:22px;color:#fff;background:#463c50;border:none;font-family:inherit;cursor:pointer;letter-spacing:4px}
+#battle-menu button:active{background:#5a4c66}
+#battle-menu button.hl{background:#b45a1e}
+#controls{width:100%;max-width:625px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px 24px;gap:10px}
+#dpad{display:grid;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(3,60px);gap:5px}
+#dpad .up{grid-column:2;grid-row:1}
+#dpad .left{grid-column:1;grid-row:2}
+#dpad .down{grid-column:2;grid-row:3}
+#dpad .right{grid-column:3;grid-row:2}
+.dbtn{background:#3c5a8c;color:#fff;font-size:24px;border:none;cursor:pointer;font-family:inherit}
+.dbtn:active{background:#2b4470}
+#btn-q{width:96px;height:96px;border-radius:50%;background:#8c3c3c;color:#fff;font-size:20px;border:none;cursor:pointer;font-family:inherit;font-weight:bold}
+#btn-q:active{background:#b04c4c}
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0c0c12;color:#ffe650;font-size:24px;padding:12px 26px;z-index:50;display:none;border:2px solid #ffe650;text-align:center;max-width:82%;letter-spacing:1px}
+.modal{position:fixed;inset:0;background:rgba(10,10,18,.88);display:none;align-items:center;justify-content:center;z-index:100}
+.modal.active{display:flex}
+.panel{width:min(480px,90vw);background:#2a2e3e;border-top:4px solid #ffdc78;padding:28px 16px;text-align:center}
+.modal-title{color:#ffdc78;font-size:24px;font-weight:bold;margin-bottom:10px}
+.modal-sub{color:#ebf0fa;font-size:16px;margin-bottom:16px}
+.panel button{width:150px;height:58px;margin:8px;font-size:20px;background:#3c5a8c;color:#fff;border:none;cursor:pointer;font-family:inherit}
+.panel button:active{background:#2b4470}
+.modal-note{color:#96a0be;font-size:13px;margin-top:12px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 主菜单 -->
+  <div id="screen-menu" class="screen active">
+    <div class="title">像素回合制战斗</div>
+    <div class="subtitle">YOUXI</div>
+    <button class="menu-btn" id="btn-new">新游戏</button>
+    <button class="menu-btn" id="btn-continue">继续游戏</button>
+    <button class="menu-btn" id="btn-exit">退出游戏</button>
+  </div>
+
+  <!-- 角色选择 -->
+  <div id="screen-select" class="screen">
+    <div class="title" style="margin-top:20px;font-size:26px">选择你的角色</div>
+    <div class="cards">
+      <div class="card" data-cls="0"><canvas width="200" height="200"></canvas><div class="card-name">战士</div><div class="card-sub">单击选择</div></div>
+      <div class="card" data-cls="1"><canvas width="200" height="200"></canvas><div class="card-name">法师</div><div class="card-sub">单击选择</div></div>
+      <div class="card" data-cls="2"><canvas width="200" height="200"></canvas><div class="card-name">弓箭手</div><div class="card-sub">单击选择</div></div>
+    </div>
+  </div>
+
+  <!-- 游戏界面 -->
+  <div id="screen-playing" class="screen">
+    <div id="topbar">
+      <div id="stat-hp"></div>
+      <div id="info-line1"></div>
+      <button id="btn-menu">菜单</button>
+      <div id="info-line2"></div>
+    </div>
+    <div id="canvas-wrap"><canvas id="game" width="625" height="625"></canvas></div>
+    <div id="battle-status"></div>
+    <div id="battle-menu">
+      <button id="bm-attack">攻击</button>
+      <button id="bm-move">移动</button>
+      <button id="bm-skill">技能</button>
+      <button id="bm-bag">背包</button>
+    </div>
+    <div id="controls">
+      <div id="dpad">
+        <button class="dbtn up" data-dx="0" data-dy="-1">▲</button>
+        <button class="dbtn left" data-dx="-1" data-dy="0">◀</button>
+        <button class="dbtn down" data-dx="0" data-dy="1">▼</button>
+        <button class="dbtn right" data-dx="1" data-dy="0">▶</button>
+      </div>
+      <button id="btn-q">Q<br>技能</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- 击杀奖励弹窗 -->
+  <div id="reward-modal" class="modal">
+    <div class="panel">
+      <div class="modal-title" id="reward-title">击杀奖励！</div>
+      <div class="modal-sub">选择一项属性永久 +1：</div>
+      <button id="rw-hp">HP +1</button>
+      <button id="rw-atk">攻击 +1</button>
+      <button id="rw-mp">MP +1</button>
+      <div class="modal-note">点击后立即生效，并保存到存档</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+/* ============ 像素角色数据（与桌面版 characters.h 一致） ============ */
+var WARRIOR=[
+[0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0,6,6,0,0],
+[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,6,6,0,0],
+[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,5,5,0,0],
+[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,5,5,0,0],
+[0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,5,5,0,0],
+[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,5,5,0,0],
+[0,0,0,0,0,0,0,3,3,2,2,2,2,2,2,2,3,3,0,0,0,5,5,0,0],
+[0,4,6,6,6,4,0,3,3,2,2,2,2,2,2,2,3,3,0,0,0,5,5,0,0],
+[0,4,6,6,6,4,0,0,3,2,6,6,6,6,6,2,3,0,0,0,0,5,5,0,0],
+[0,4,4,4,4,4,0,0,1,2,6,6,6,6,6,2,1,0,0,0,0,5,5,0,0],
+[0,4,4,4,4,4,4,4,3,3,3,3,3,3,3,4,4,4,4,0,5,5,0,0,0],
+[0,4,4,4,4,4,4,4,3,3,3,3,3,3,3,4,4,4,4,0,5,5,0,0,0],
+[0,4,4,4,4,4,4,4,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5,0,0],
+[0,4,4,4,4,4,4,4,0,3,3,3,3,3,0,4,4,4,4,6,6,6,6,0,0],
+[0,4,4,4,4,4,4,4,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5,0,0],
+[0,4,4,4,4,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0],
+[0,4,4,4,4,0,3,4,4,4,4,4,4,4,4,4,3,0,0,0,0,0,0,0,0],
+[0,4,4,4,4,3,3,4,4,4,4,4,4,4,4,4,3,3,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+var MAGE=[
+[0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,6,6,6,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,6,6,6,6,6,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,6,6,6,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,3,3,6,3,0,0,0,0,0,0,6,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,3,6,6,6,3,0,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,6,3,3,0,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,0,5,5,0,0,0],
+[0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,0,5,5,0,0,0],
+[0,0,0,0,0,0,3,3,3,2,2,2,2,2,2,2,3,3,3,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,2,6,6,6,6,6,2,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,2,6,6,6,6,6,2,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,2,6,6,6,6,6,2,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,2,6,6,6,6,6,2,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,6,6,6,6,6,0,0,0,0,0,5,5,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,1,1,0,0,0],
+[0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,0,0,0,1,1,0,0,0],
+[0,0,0,0,0,0,0,3,4,4,4,4,4,4,4,4,4,0,0,0,1,1,0,0,0],
+[0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0],
+[0,0,0,0,0,3,3,6,6,6,6,6,6,6,6,6,6,6,3,0,0,0,0,0,0],
+[0,0,0,0,0,3,3,6,6,6,6,6,6,6,6,6,6,6,3,3,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+var ARCHER=[
+[0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0],
+[0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,6,6,0,0],
+[0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,6,6,5,5],
+[0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,6,6,5,0],
+[0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,6,6,0,0],
+[0,0,0,0,0,0,0,3,3,2,2,2,2,2,2,2,3,3,0,0,5,6,6,0,0],
+[0,0,0,0,0,0,0,3,3,2,6,6,6,6,6,2,3,3,0,0,5,6,6,0,0],
+[0,0,0,0,0,0,0,3,3,2,6,6,6,6,6,2,3,3,0,0,5,6,6,0,0],
+[0,0,0,0,0,0,0,4,3,3,3,3,3,3,3,3,3,3,0,0,5,6,6,0,0],
+[0,0,0,0,0,0,4,4,0,3,3,3,3,3,3,3,0,0,0,0,5,6,6,0,0],
+[0,0,0,0,0,4,4,4,0,3,3,3,3,3,3,3,0,0,0,0,0,6,6,0,0],
+[0,0,0,0,4,4,4,4,0,0,3,3,3,3,0,0,0,0,0,0,0,6,6,5,0],
+[0,0,0,0,4,4,4,4,4,3,3,3,3,3,3,0,0,0,0,0,0,6,6,5,5],
+[0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0],
+[0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,0,0,0,0,0,0,0,0],
+[0,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+[0,4,4,6,6,6,4,4,4,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0],
+[0,0,0,5,5,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0],
+[0,0,0,5,5,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0],
+[0,0,0,5,5,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+var PALETTE=[[0,0,0],[40,36,52],[240,210,170],[70,110,230],[230,180,80],[220,220,225],[255,255,180]];
+var PALETTE_RED=[[0,0,0],[44,28,32],[240,210,170],[205,34,34],[222,88,44],[255,126,122],[255,214,170]];
+var SPRITES=[WARRIOR,MAGE,ARCHER];
+var MONSTER_NAMES=['战士','法师','弓箭手'];
+var CHAR_NAMES=['战士','法师','弓箭手'];
+
+/* ============ 常量 ============ */
+var CELL=25, SIZE=25, MAP_PX=625;
+var HIT_RED_MS=800;
+var SAVE_KEY='youxi_save_v1';
+var DIR={UP:0,RIGHT:1,DOWN:2,LEFT:3};
+
+/* ============ 全局状态 ============ */
+var screen='menu';
+var save=null;
+var hasSave=false;
+var battle={active:false,moving:false,targeting:false,moveCount:0};
+var rewardPopup=false, rewardFromSkill=false;
+var playerHitUntil=0;
+var toastTimer=null;
+
+var game=document.getElementById('game');
+var ctx=game.getContext('2d');
+
+/* ============ 工具函数 ============ */
+function classStats(cls){
+  if(cls===1) return {hp:3,atk:4,mp:7};
+  if(cls===2) return {hp:5,atk:5,mp:4};
+  return {hp:7,atk:5,mp:2};
+}
+function playerStats(){
+  var c=classStats(save.characterId);
+  c.hp+=save.hpBonus; c.atk+=save.atkBonus; c.mp+=save.mpBonus;
+  return c;
+}
+function dirFromDelta(dx,dy){
+  if(dx>0) return DIR.RIGHT;
+  if(dx<0) return DIR.LEFT;
+  if(dy>0) return DIR.DOWN;
+  return DIR.UP;
+}
+function rand(n){ return Math.floor(Math.random()*n); }
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=rand(i+1);
+    var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+}
+function toast(text,ms){
+  var el=document.getElementById('toast');
+  if(!text){ el.style.display='none'; return; }
+  el.textContent=text;
+  el.style.display='block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ el.style.display='none'; }, ms||2000);
+}
+
+/* ============ 地图生成 ============ */
+function mapGenerate(){
+  for(;;){
+    var grid=[];
+    for(var y=0;y<SIZE;y++){ grid.push([]); for(var x=0;x<SIZE;x++) grid[y].push(0); }
+    var start=(rand(2)===0)?{x:0,y:rand(SIZE)}:{x:rand(SIZE),y:SIZE-1};
+    var end=(rand(2)===0)?{x:SIZE-1,y:rand(SIZE)}:{x:rand(SIZE),y:0};
+    var placed=0, guard=0, obstacleCount=Math.floor(SIZE*SIZE*40/100);
+    while(placed<obstacleCount && guard<obstacleCount*100){
+      guard++;
+      var x=rand(SIZE), y=rand(SIZE);
+      if((x===start.x&&y===start.y)||(x===end.x&&y===end.y)||grid[y][x]===1) continue;
+      grid[y][x]=1; placed++;
+    }
+    if(isReachable(grid,start,end)){
+      save.mapGrid=flattenGrid(grid);
+      save.start=start; save.end=end;
+      return;
+    }
+  }
+}
+function flattenGrid(grid){ var a=[]; for(var y=0;y<SIZE;y++) for(var x=0;x<SIZE;x++) a.push(grid[y][x]); return a; }
+function unflattenGrid(a){ var g=[]; for(var y=0;y<SIZE;y++){ g.push([]); for(var x=0;x<SIZE;x++) g[y].push(a[y*SIZE+x]); } return g; }
+function gridAt(gx,gy){ return save.mapGrid[gy*SIZE+gx]; }
+function isReachable(grid,from,to){
+  var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  var visited=[]; for(var y=0;y<SIZE;y++){ visited.push([]); for(var x=0;x<SIZE;x++) visited[y].push(false); }
+  var q=[from]; visited[from.y][from.x]=true;
+  while(q.length){
+    var cur=q.shift();
+    if(cur.x===to.x&&cur.y===to.y) return true;
+    for(var i=0;i<4;i++){
+      var nx=cur.x+dirs[i][0], ny=cur.y+dirs[i][1];
+      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
+      if(grid[ny][nx]!==0||visited[ny][nx]) continue;
+      visited[ny][nx]=true; q.push({x:nx,y:ny});
+    }
+  }
+  return false;
+}
+
+/* ============ 攻击范围 ============ */
+function archerInRange(ax,ay,adir,bx,by){
+  var dx=bx-ax, dy=by-ay, front=false, back=false, side=false;
+  switch(adir){
+    case DIR.UP:   front=(dx===0&&dy>=-4&&dy<=-1); back=(dx===0&&dy===1); side=(dy===0&&dx>=-2&&dx<=2&&dx!==0); break;
+    case DIR.DOWN: front=(dx===0&&dy>=1&&dy<=4);   back=(dx===0&&dy===-1); side=(dy===0&&dx>=-2&&dx<=2&&dx!==0); break;
+    case DIR.RIGHT:front=(dy===0&&dx>=1&&dx<=4);   back=(dy===0&&dx===-1); side=(dx===0&&dy>=-2&&dy<=2&&dy!==0); break;
+    case DIR.LEFT: front=(dy===0&&dx>=-4&&dx<=-1); back=(dy===0&&dx===1); side=(dx===0&&dy>=-2&&dy<=2&&dy!==0); break;
+  }
+  return front||back||side;
+}
+function inAttackRange(cls,ax,ay,adir,bx,by){
+  var dx=Math.abs(bx-ax), dy=Math.abs(by-ay);
+  if(cls===0) return dx<=1&&dy<=1&&!(dx===0&&dy===0);
+  if(cls===1) return (dx===0&&dy<=2)||(dy===0&&dx<=2);
+  return archerInRange(ax,ay,adir,bx,by);
+}
+function playerInAttackRange(m){
+  return inAttackRange(save.characterId,save.playerX,save.playerY,save.playerDir,m.x,m.y);
+}
+function anyMonsterInPlayerRange(){
+  for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(m.alive&&playerInAttackRange(m)) return true; }
+  return false;
+}
+function anyMonsterCanAttackPlayer(){
+  for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(!m.alive) continue;
+    if(inAttackRange(m.type,m.x,m.y,m.dir,save.playerX,save.playerY)) return true; }
+  return false;
+}
+function newlyEnteredMonsterRange(oldX,oldY){
+  for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(!m.alive) continue;
+    var before=inAttackRange(m.type,m.x,m.y,m.dir,oldX,oldY);
+    var after=inAttackRange(m.type,m.x,m.y,m.dir,save.playerX,save.playerY);
+    if(!before&&after) return true; }
+  return false;
+}
+
+/* ============ 怪物生成与成长 ============ */
+function applyMonsterGrowth(m,clearCount){
+  var times=Math.floor(clearCount/3);
+  for(var i=0;i<times;i++){
+    if(rand(2)===0) m.hp++; else m.atk++;
+  }
+}
+function generateMonsters(){
+  save.monsters=[];
+  var count=5+save.clearCount*2; if(count>35) count=35;
+  var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  var visited=[]; for(var y=0;y<SIZE;y++){ visited.push([]); for(var x=0;x<SIZE;x++) visited[y].push(false); }
+  var reachable=[];
+  var q=[{x:save.start.x,y:save.start.y}]; visited[save.start.y][save.start.x]=true;
+  while(q.length){
+    var cur=q.shift(); reachable.push(cur);
+    for(var i=0;i<4;i++){
+      var nx=cur.x+dirs[i][0], ny=cur.y+dirs[i][1];
+      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
+      if(gridAt(nx,ny)!==0||visited[ny][nx]) continue;
+      visited[ny][nx]=true; q.push({x:nx,y:ny});
+    }
+  }
+  var guard=0;
+  while(save.monsters.length<count && guard<count*200+500){
+    guard++;
+    if(reachable.length===0) break;
+    var p=reachable[rand(reachable.length)];
+    if(p.x===save.start.x&&p.y===save.start.y) continue;
+    if(p.x===save.end.x&&p.y===save.end.y) continue;
+    if(p.x===save.playerX&&p.y===save.playerY) continue;
+    var occ=false;
+    for(var j=0;j<save.monsters.length;j++) if(save.monsters[j].x===p.x&&save.monsters[j].y===p.y){occ=true;break;}
+    if(occ) continue;
+    var m={type:rand(3),x:p.x,y:p.y,hp:0,atk:0,dir:DIR.UP,alive:true};
+    var cs=classStats(m.type);
+    m.hp=cs.hp;
+    m.atk=Math.ceil(cs.atk/2);
+    applyMonsterGrowth(m,save.clearCount);
+    save.monsters.push(m);
+  }
+}
+function moveMonstersRandomly(){
+  var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i]; if(!m.alive) continue;
+    var order=[0,1,2,3]; shuffle(order);
+    for(var k=0;k<4;k++){
+      var nx=m.x+dirs[order[k]][0], ny=m.y+dirs[order[k]][1];
+      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
+      if(gridAt(nx,ny)===1) continue;
+      if(nx===save.playerX&&ny===save.playerY) continue;
+      var occ=false;
+      for(var j=0;j<save.monsters.length;j++){
+        var o=save.monsters[j];
+        if(!o.alive||o===m) continue;
+        if(o.x===nx&&o.y===ny){occ=true;break;}
+      }
+      if(occ) continue;
+      m.x=nx; m.y=ny;
+      m.dir=dirFromDelta(dirs[order[k]][0],dirs[order[k]][1]);
+      break;
+    }
+  }
+}
+function runMonsterTurn(){
+  var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i]; if(!m.alive) continue;
+    if(inAttackRange(m.type,m.x,m.y,m.dir,save.playerX,save.playerY)){
+      var dmg=m.atk;
+      if(save.tempHP>0){
+        var absorbed=(dmg<save.tempHP)?dmg:save.tempHP;
+        save.tempHP-=absorbed; dmg-=absorbed;
+      }
+      save.playerHp-=dmg;
+      markPlayerHit();
+      if(save.playerHp<=0) return true;
+      continue;
+    }
+    var cands=[], n=0;
+    var curDist=Math.abs(m.x-save.playerX)+Math.abs(m.y-save.playerY);
+    for(var d=0;d<4;d++){
+      var nx=m.x+dirs[d][0], ny=m.y+dirs[d][1];
+      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
+      if(gridAt(nx,ny)===1) continue;
+      if(nx===save.playerX&&ny===save.playerY) continue;
+      var occ=false;
+      for(var j=0;j<save.monsters.length;j++){
+        var o=save.monsters[j];
+        if(!o.alive||o===m) continue;
+        if(o.x===nx&&o.y===ny){occ=true;break;}
+      }
+      if(occ) continue;
+      var nd=Math.abs(nx-save.playerX)+Math.abs(ny-save.playerY);
+      if(nd<curDist) cands[n++]={dx:dirs[d][0],dy:dirs[d][1]};
+    }
+    if(n>0){
+      var c=cands[rand(n)];
+      m.x+=c.dx; m.y+=c.dy;
+      m.dir=dirFromDelta(c.dx,c.dy);
+    }
+  }
+  return false;
+}
+
+/* ============ 通关 / 死亡 ============ */
+function completeLevel(){
+  toast('恭喜通关！');
+  save.clearCount++;
+  mapGenerate();
+  save.playerX=save.start.x; save.playerY=save.start.y;
+  generateMonsters();
+  save.playerMp=playerStats().mp;
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  saveGame();
+  redraw();
+}
+function playerDie(){
+  save.tempHP=0; save.archerBuff=0;
+  save.playerMp=playerStats().mp;
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  saveGame();
+  screen='menu';
+  redraw();
+  alert('你被怪物击败了……');
+}
+function endBattle(victory){
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  if(victory) toast('战斗胜利！');
+  redraw();
+}
+function enterBattle(monsterFirst){
+  battle.active=true; battle.moving=false; battle.moveCount=0;
+  if(monsterFirst){
+    if(runMonsterTurn()){ playerDie(); return; }
+  }
+  redraw();
+}
+function saveBackToMenu(){
+  saveGame();
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  screen='menu';
+  redraw();
+}
+
+/* ============ 技能 ============ */
+function doSkill(){
+  if(battle.active){ battle.moving=false; battle.targeting=false; }
+  var cls=save.characterId;
+  if(cls===0){
+    if(save.playerMp<2){ toast('MP 不足！'); redraw(); return; }
+    save.playerMp-=2;
+    var maxHp=playerStats().hp;
+    save.playerHp+=10;
+    if(save.playerHp>maxHp){
+      var ov=save.playerHp-maxHp;
+      save.playerHp=maxHp;
+      save.tempHP+=ov; if(save.tempHP>99) save.tempHP=99;
+    }
+    toast(save.tempHP>0?('恢复 10 HP！ 临时HP:'+save.tempHP):'恢复 10 HP！');
+  } else if(cls===1){
+    if(save.playerMp<4){ toast('MP 不足！'); redraw(); return; }
+    var aliveList=[];
+    for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive) aliveList.push(save.monsters[i]);
+    if(aliveList.length===0){ toast('没有可攻击的怪物！'); redraw(); return; }
+    save.playerMp-=4;
+    shuffle(aliveList);
+    var n=aliveList.length; if(n>3) n=3;
+    var dmg=playerStats().atk+3;
+    var hit=0;
+    for(var j=0;j<n;j++){
+      var t=aliveList[j];
+      t.hp-=dmg; hit++;
+      if(t.hp<=0){
+        t.alive=false; save.kills++;
+        saveGame();
+        if(Math.floor(save.kills/10)>save.awarded){
+          rewardFromSkill=true; rewardPopup=true;
+          showReward();
+          redraw();
+          return;
+        }
+      }
+    }
+    toast('群攻发动！对 '+hit+' 只怪物造成 '+dmg+' 伤害');
+  } else {
+    var cost=Math.ceil(save.playerMp*2/3); if(cost<1) cost=1;
+    if(save.playerMp<cost){ toast('MP 不足！'); redraw(); return; }
+    save.playerMp-=cost;
+    save.archerBuff=cost;
+    toast('强化！下次普攻伤害 +'+cost);
+  }
+  saveGame();
+  redraw();
+}
+
+/* ============ 战斗流程 ============ */
+function doAttack(){
+  var hasTarget=false;
+  for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(m.alive&&playerInAttackRange(m)){hasTarget=true;break;} }
+  if(!hasTarget){ toast('攻击范围内没有怪物！'); redraw(); return; }
+  battle.targeting=true; battle.moving=false;
+  redraw();
+}
+function doMove(){ battle.moving=true; redraw(); }
+function finishAttackTurn(){
+  var allDead=true;
+  for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive){allDead=false;break;}
+  if(allDead){ endBattle(true); return; }
+  if(runMonsterTurn()){ playerDie(); return; }
+  battle.moveCount=0; battle.moving=false; battle.targeting=false;
+  saveGame();
+  redraw();
+}
+function attackMonster(target){
+  var atk=playerStats().atk;
+  atk+=save.archerBuff;
+  save.archerBuff=0;
+  target.hp-=atk;
+  if(target.hp<=0){
+    target.alive=false;
+    save.kills++;
+    saveGame();
+    if(Math.floor(save.kills/10)>save.awarded){
+      rewardFromSkill=false;
+      rewardPopup=true;
+      showReward();
+      redraw();
+      return;
+    }
+  }
+  finishAttackTurn();
+}
+function chooseReward(choice){
+  if(choice===0){ save.hpBonus++; save.playerHp++; }
+  else if(choice===1){ save.atkBonus++; }
+  else { save.mpBonus++; save.playerMp++; }
+  save.awarded++;
+  rewardPopup=false;
+  hideReward();
+  saveGame();
+  if(rewardFromSkill){
+    rewardFromSkill=false;
+    battle.moveCount=0; battle.moving=false; battle.targeting=false;
+    redraw();
+    return;
+  }
+  finishAttackTurn();
+}
+
+/* ============ 移动 ============ */
+function tryStep(nx,ny){
+  if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) return false;
+  if(gridAt(nx,ny)===1) return false;
+  for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(m.alive&&m.x===nx&&m.y===ny) return false; }
+  return true;
+}
+function handleMove(dx,dy){
+  var oldX=save.playerX, oldY=save.playerY;
+  var nx=oldX+dx, ny=oldY+dy;
+  if(!tryStep(nx,ny)) return;
+  save.playerX=nx; save.playerY=ny;
+  save.playerDir=dirFromDelta(dx,dy);
+  if(nx===save.end.x&&ny===save.end.y){ completeLevel(); return; }
+  if(newlyEnteredMonsterRange(oldX,oldY)){ enterBattle(true); return; }
+  moveMonstersRandomly();
+  if(anyMonsterInPlayerRange()){ enterBattle(false); return; }
+  saveGame();
+  redraw();
+}
+function handleBattleMove(dx,dy){
+  var oldX=save.playerX, oldY=save.playerY;
+  var nx=oldX+dx, ny=oldY+dy;
+  if(!tryStep(nx,ny)) return;
+  save.playerX=nx; save.playerY=ny;
+  save.playerDir=dirFromDelta(dx,dy);
+  battle.moveCount++;
+  if(nx===save.end.x&&ny===save.end.y){ completeLevel(); return; }
+  if(newlyEnteredMonsterRange(oldX,oldY)){
+    if(runMonsterTurn()){ playerDie(); return; }
+    battle.moveCount=0; battle.moving=false;
+    saveGame(); redraw();
+    return;
+  }
+  if(!anyMonsterInPlayerRange()&&!anyMonsterCanAttackPlayer()){
+    endBattle(false);
+    saveGame();
+    return;
+  }
+  if(battle.moveCount>=2){
+    if(runMonsterTurn()){ playerDie(); return; }
+    battle.moveCount=0; battle.moving=false;
+    saveGame(); redraw();
+    return;
+  }
+  battle.moving=false;
+  saveGame();
+  redraw();
+}
+
+/* ============ 存档 ============ */
+function saveGame(){
+  var d={
+    characterId:save.characterId, playerX:save.playerX, playerY:save.playerY,
+    playerHp:save.playerHp, playerDir:save.playerDir,
+    clearCount:save.clearCount, kills:save.kills, awarded:save.awarded,
+    hpBonus:save.hpBonus, atkBonus:save.atkBonus, mpBonus:save.mpBonus,
+    playerMp:save.playerMp, tempHP:save.tempHP, archerBuff:save.archerBuff,
+    mapGrid:save.mapGrid, start:save.start, end:save.end, monsters:save.monsters
+  };
+  try{ localStorage.setItem(SAVE_KEY,JSON.stringify(d)); hasSave=true; }catch(e){}
+}
+function newGame(){
+  screen='select';
+  redraw();
+}
+function chooseChar(cls){
+  save={
+    characterId:cls, playerX:0, playerY:0, playerHp:0, playerDir:DIR.UP,
+    clearCount:0, kills:0, awarded:0, hpBonus:0, atkBonus:0, mpBonus:0,
+    playerMp:0, tempHP:0, archerBuff:0, mapGrid:[], start:{x:0,y:0}, end:{x:0,y:0}, monsters:[]
+  };
+  var cs=playerStats();
+  save.playerHp=cs.hp; save.playerMp=cs.mp;
+  mapGenerate();
+  save.playerX=save.start.x; save.playerY=save.start.y;
+  generateMonsters();
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  rewardPopup=false;
+  saveGame();
+  screen='playing';
+  redraw();
+}
+function loadGame(){
+  var raw=null;
+  try{ raw=localStorage.getItem(SAVE_KEY); }catch(e){}
+  if(!raw) return false;
+  try{
+    var d=JSON.parse(raw);
+    save={characterId:d.characterId, playerX:d.playerX, playerY:d.playerY, playerHp:d.playerHp,
+      playerDir:d.playerDir, clearCount:d.clearCount, kills:d.kills, awarded:d.awarded,
+      hpBonus:d.hpBonus, atkBonus:d.atkBonus, mpBonus:d.mpBonus, playerMp:d.playerMp,
+      tempHP:d.tempHP, archerBuff:d.archerBuff, mapGrid:d.mapGrid, start:d.start, end:d.end, monsters:d.monsters||[]};
+  }catch(e){ return false; }
+  if(!save.mapGrid||save.mapGrid.length!==SIZE*SIZE) return false;
+  var pcs=playerStats();
+  if(save.playerHp<=0||save.playerHp>pcs.hp) save.playerHp=pcs.hp;
+  if(save.playerMp<=0||save.playerMp>pcs.mp) save.playerMp=pcs.mp;
+  if(save.tempHP<0) save.tempHP=0;
+  if(save.tempHP>99) save.tempHP=99;
+  if(save.archerBuff<0) save.archerBuff=0;
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i];
+    var mcs=classStats(m.type);
+    var growth=Math.floor(save.clearCount/3);
+    if(m.hp<=0||m.hp>mcs.hp+growth||m.atk<=0||m.atk>Math.ceil(mcs.atk/2)+growth){
+      m.hp=mcs.hp; m.atk=Math.ceil(mcs.atk/2);
+      applyMonsterGrowth(m,save.clearCount);
+    }
+  }
+  if(save.monsters.length===0) generateMonsters();
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  screen='playing';
+  redraw();
+  return true;
+}
+function continueGame(){
+  if(loadGame()){
+    toast('存档已恢复');
+  }else{
+    alert('没有找到存档，请先开始新游戏。');
+  }
+}
+
+/* ============ 绘制 ============ */
+function drawSprite(sprite,px,py,scale,pal){
+  for(var sy=0;sy<25;sy++){
+    for(var sx=0;sx<25;sx++){
+      var idx=sprite[sy][sx]; if(idx===0) continue;
+      var c=pal[idx];
+      ctx.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+      ctx.fillRect(px+sx*scale,py+sy*scale,scale,scale);
+    }
+  }
+}
+function drawSpriteBorder(px,py,size,color){
+  ctx.strokeStyle=color; ctx.lineWidth=2;
+  ctx.strokeRect(px-2,py-2,size+4,size+4);
+}
+function drawRangeGridCell(gx,gy,color){
+  var px=gx*CELL, py=gy*CELL;
+  ctx.strokeStyle=color; ctx.lineWidth=1;
+  ctx.setLineDash([3,3]);
+  ctx.strokeRect(px+0.5,py+0.5,CELL-1,CELL-1);
+  ctx.setLineDash([]);
+}
+function drawMap(){
+  ctx.fillStyle='rgb(20,24,32)'; ctx.fillRect(0,0,MAP_PX,MAP_PX);
+  for(var y=0;y<SIZE;y++){
+    for(var x=0;x<SIZE;x++){
+      var px=x*CELL, py=y*CELL;
+      ctx.fillStyle=(gridAt(x,y)===1)?'rgb(60,66,78)':'rgb(214,220,232)';
+      ctx.fillRect(px,py,CELL,CELL);
+    }
+  }
+  ctx.strokeStyle='rgb(140,150,170)'; ctx.lineWidth=1; ctx.beginPath();
+  for(var i=0;i<=SIZE;i++){
+    ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,MAP_PX);
+    ctx.moveTo(0,i*CELL); ctx.lineTo(MAP_PX,i*CELL);
+  }
+  ctx.stroke();
+  ctx.font='bold 14px Courier New'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='rgb(20,140,60)'; ctx.fillText('S',save.start.x*CELL+CELL/2,save.start.y*CELL+CELL/2);
+  ctx.fillStyle='rgb(200,30,30)'; ctx.fillText('E',save.end.x*CELL+CELL/2,save.end.y*CELL+CELL/2);
+}
+function drawPlayer(){
+  var sprite=SPRITES[save.characterId];
+  var pal=(Date.now()<playerHitUntil)?PALETTE_RED:PALETTE;
+  drawSprite(sprite,save.playerX*CELL,save.playerY*CELL,1,pal);
+  if(battle.active) drawSpriteBorder(save.playerX*CELL,save.playerY*CELL,25,'rgb(255,220,60)');
+}
+function drawMonsters(){
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i]; if(!m.alive) continue;
+    drawSprite(SPRITES[m.type],m.x*CELL,m.y*CELL,1,PALETTE_RED);
+    if(battle.active) drawSpriteBorder(m.x*CELL,m.y*CELL,25,'rgb(255,220,60)');
+  }
+}
+function drawAttackRanges(){
+  for(var y=0;y<SIZE;y++){
+    for(var x=0;x<SIZE;x++){
+      if(inAttackRange(save.characterId,save.playerX,save.playerY,save.playerDir,x,y))
+        drawRangeGridCell(x,y,'rgb(70,220,70)');
+    }
+  }
+  if(battle.active){
+    for(var i=0;i<save.monsters.length;i++){
+      var m=save.monsters[i]; if(!m.alive) continue;
+      for(var y2=0;y2<SIZE;y2++){
+        for(var x2=0;x2<SIZE;x2++){
+          if(inAttackRange(m.type,m.x,m.y,m.dir,x2,y2))
+            drawRangeGridCell(x2,y2,'rgb(255,90,90)');
+        }
+      }
+    }
+  }
+}
+function markPlayerHit(){
+  playerHitUntil=Date.now()+HIT_RED_MS;
+  redraw();
+  setTimeout(function(){
+    if(screen==='playing') redraw();
+  },HIT_RED_MS);
+}
+function drawPlaying(){
+  if(!save) return;
+  drawMap();
+  drawPlayer();
+  drawMonsters();
+  drawAttackRanges();
+}
+
+/* ============ DOM 更新 ============ */
+function updateTop(){
+  if(!save) return;
+  var p=playerStats();
+  var s='HP:'+save.playerHp;
+  if(save.tempHP>0) s+='+'+save.tempHP;
+  s+=' ATK:'+p.atk+' MP:'+save.playerMp;
+  if(save.archerBuff>0) s+=' 强化+'+save.archerBuff;
+  document.getElementById('stat-hp').textContent=s;
+  var alive=0;
+  for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive) alive++;
+  var l1='角色: '+CHAR_NAMES[save.characterId]+'  通关: '+save.clearCount+'  怪物: '+alive;
+  if(battle.active) l1+='  [战斗中]';
+  document.getElementById('info-line1').textContent=l1;
+  var l2;
+  if(battle.active){
+    l2=battle.targeting?'目标选择：点击攻击范围内的怪物'
+      :battle.moving?'移动中：按 WASD/方向键移动一格'
+      :'战斗中：选择 攻击 / 移动 / 技能 / 背包';
+  }else{
+    l2='起点 S    终点 E    WASD/方向键移动    菜单返回';
+  }
+  document.getElementById('info-line2').textContent=l2;
+}
+function updateBattleUI(){
+  var bm=document.getElementById('battle-menu');
+  bm.classList.toggle('active',battle.active);
+  document.getElementById('bm-attack').classList.toggle('hl',battle.targeting);
+  document.getElementById('bm-move').classList.toggle('hl',battle.moving);
+  var bs=document.getElementById('battle-status');
+  if(!battle.active){ bs.style.display='none'; }
+  else{
+    bs.style.display='block';
+    var h='<div class="bs-title">—— 战斗状态（可攻击目标） ——</div>';
+    var p=playerStats();
+    var ps='玩家 HP'+save.playerHp+'/'+p.hp;
+    if(save.tempHP>0) ps+='+'+save.tempHP;
+    ps+=' ATK'+p.atk+' MP'+save.playerMp;
+    if(save.archerBuff>0) ps+=' 强化+'+save.archerBuff;
+    h+='<div class="bs-player">'+ps+'</div>';
+    var idx=1;
+    for(var i=0;i<save.monsters.length;i++){
+      var m=save.monsters[i];
+      if(!m.alive) continue;
+      if(!playerInAttackRange(m)) continue;
+      var c=classStats(m.type);
+      h+='<div>'+MONSTER_NAMES[m.type]+'#'+idx+++' HP'+m.hp+'/'+(c.hp+Math.floor(save.clearCount/3))+' ATK'+m.atk+'</div>';
+    }
+    bs.innerHTML=h;
+  }
+  updateTop();
+}
+function updateSelectCards(){
+  var cards=document.querySelectorAll('.card');
+  for(var i=0;i<cards.length;i++){
+    var cv=cards[i].querySelector('canvas');
+    var c2=cv.getContext('2d');
+    var spr=SPRITES[i];
+    var scale=8; // 200px
+    c2.fillStyle='rgb(20,24,32)'; c2.fillRect(0,0,200,200);
+    var ox=(200-25*scale)/2, oy=(200-25*scale)/2;
+    for(var sy=0;sy<25;sy++){
+      for(var sx=0;sx<25;sx++){
+        var idx=spr[sy][sx]; if(idx===0) continue;
+        var col=PALETTE[idx];
+        c2.fillStyle='rgb('+col[0]+','+col[1]+','+col[2]+')';
+        c2.fillRect(ox+sx*scale,oy+sy*scale,scale,scale);
+      }
+    }
+  }
+}
+function showReward(){
+  document.getElementById('reward-title').textContent='击杀奖励！已累计击杀 '+save.kills+' 只怪物';
+  document.getElementById('reward-modal').classList.add('active');
+}
+function hideReward(){
+  document.getElementById('reward-modal').classList.remove('active');
+}
+function redraw(){
+  var screens=document.querySelectorAll('.screen');
+  for(var i=0;i<screens.length;i++) screens[i].classList.remove('active');
+  if(screen==='menu'){ document.getElementById('screen-menu').classList.add('active'); }
+  else if(screen==='select'){ document.getElementById('screen-select').classList.add('active'); }
+  else{
+    document.getElementById('screen-playing').classList.add('active');
+    updateBattleUI();
+    drawPlaying();
+  }
+}
+
+/* ============ 事件 ============ */
+function bind(id,fn){ document.getElementById(id).addEventListener('click',fn); }
+bind('btn-new',function(){ newGame(); });
+bind('btn-continue',function(){ continueGame(); });
+bind('btn-exit',function(){ saveGame(); toast('已保存，可关闭页面退出'); });
+bind('btn-menu',function(){ saveBackToMenu(); });
+bind('bm-attack',function(){ if(rewardPopup)return; doAttack(); });
+bind('bm-move',function(){ if(rewardPopup)return; doMove(); });
+bind('bm-skill',function(){ if(rewardPopup)return; doSkill(); });
+bind('bm-bag',function(){ if(rewardPopup)return; toast('背包暂未开放！'); });
+bind('rw-hp',function(){ chooseReward(0); });
+bind('rw-atk',function(){ chooseReward(1); });
+bind('rw-mp',function(){ chooseReward(2); });
+bind('btn-q',function(){ if(rewardPopup||screen!=='playing')return; doSkill(); });
+
+var cards=document.querySelectorAll('.card');
+for(var ci=0;ci<cards.length;ci++){
+  (function(cls){
+    cards[ci].addEventListener('click',function(){ chooseChar(cls); });
+  })(ci);
+}
+var dbtns=document.querySelectorAll('.dbtn');
+for(var bi=0;bi<dbtns.length;bi++){
+  (function(btn){
+    btn.addEventListener('click',function(){
+      if(rewardPopup||screen!=='playing') return;
+      var dx=parseInt(btn.getAttribute('data-dx'),10);
+      var dy=parseInt(btn.getAttribute('data-dy'),10);
+      if(battle.active&&battle.moving) handleBattleMove(dx,dy);
+      else if(!battle.active) handleMove(dx,dy);
+    });
+  })(dbtns[bi]);
+}
+
+game.addEventListener('click',function(e){
+  if(rewardPopup||screen!=='playing') return;
+  if(!battle.active||!battle.targeting) return;
+  var r=game.getBoundingClientRect();
+  var x=(e.clientX-r.left)/r.width*MAP_PX;
+  var y=(e.clientY-r.top)/r.height*MAP_PX;
+  var gx=Math.floor(x/CELL), gy=Math.floor(y/CELL);
+  var target=null;
+  for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(m.alive&&m.x===gx&&m.y===gy){target=m;break;} }
+  if(target&&playerInAttackRange(target)){
+    attackMonster(target);
+  }else if(target){
+    toast('该怪物不在攻击范围内！');
+    battle.targeting=false;
+    redraw();
+  }else{
+    toast('请选择攻击范围内的怪物！');
+    battle.targeting=false;
+    redraw();
+  }
+});
+
+window.addEventListener('keydown',function(e){
+  if(rewardPopup) return;
+  var k=e.key;
+  var up=(k==='w'||k==='W'||k==='ArrowUp');
+  var down=(k==='s'||k==='S'||k==='ArrowDown');
+  var left=(k==='a'||k==='A'||k==='ArrowLeft');
+  var right=(k==='d'||k==='D'||k==='ArrowRight');
+  var q=(k==='q'||k==='Q');
+  if(screen!=='playing') return;
+  if(k==='Escape'){ saveBackToMenu(); return; }
+  if(q){ doSkill(); return; }
+  if(battle.active&&battle.moving){
+    if(up) handleBattleMove(0,-1);
+    else if(down) handleBattleMove(0,1);
+    else if(left) handleBattleMove(-1,0);
+    else if(right) handleBattleMove(1,0);
+    return;
+  }
+  if(!battle.active){
+    if(up) handleMove(0,-1);
+    else if(down) handleMove(0,1);
+    else if(left) handleMove(-1,0);
+    else if(right) handleMove(1,0);
+  }
+});
+
+/* ============ 初始化 ============ */
+updateSelectCards();
+redraw();
+</script>
+</body>
+</html>
