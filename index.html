@@ -384,27 +384,54 @@ function generateMonsters(){
     save.monsters.push(m);
   }
 }
-function moveMonstersRandomly(){
-  var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+// 探索阶段同步移动：玩家每移动一次，全场存活怪物统一向玩家靠近移动一格
+// （不撞边界/障碍/其他怪物/玩家）。约 70% 概率沿 BFS 最短路方向逼近，其余随机扰动。
+function moveMonstersTowardPlayer(){
+  // BFS 以玩家为源泛洪：每格到玩家的最短距离（仅空地可达）
+  var SIZE2=SIZE, INF=1<<29;
+  var dist=[]; for(var yy=0;yy<SIZE2;yy++){ dist.push([]); for(var xx=0;xx<SIZE2;xx++) dist[yy].push(INF); }
+  var q=[], qh=0;
+  dist[save.playerY][save.playerX]=0; q.push([save.playerX,save.playerY]);
+  while(qh<q.length){
+    var cur=q[qh++], cx=cur[0], cy=cur[1];
+    var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+    for(var di=0;di<4;di++){
+      var nx=cx+dirs[di][0], ny=cy+dirs[di][1];
+      if(nx<0||nx>=SIZE2||ny<0||ny>=SIZE2) continue;
+      if(gridAt(nx,ny)===1) continue;
+      if(dist[ny][nx]!==INF) continue;
+      dist[ny][nx]=dist[cy][cx]+1; q.push([nx,ny]);
+    }
+  }
+  var dirs4=[[1,0],[-1,0],[0,1],[0,-1]];
   for(var i=0;i<save.monsters.length;i++){
     var m=save.monsters[i]; if(!m.alive) continue;
-    var order=[0,1,2,3]; shuffle(order);
-    for(var k=0;k<4;k++){
-      var nx=m.x+dirs[order[k]][0], ny=m.y+dirs[order[k]][1];
-      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
-      if(gridAt(nx,ny)===1) continue;
-      if(nx===save.playerX&&ny===save.playerY) continue;
+    var allCands=[], bestCands=[];
+    var bestDist=INF;
+    for(var d=0;d<4;d++){
+      var nx=m.x+dirs4[d][0], ny=m.y+dirs4[d][1];
+      if(nx<0||nx>=SIZE2||ny<0||ny>=SIZE2) continue;          // 边界
+      if(gridAt(nx,ny)===1) continue;                          // 障碍
+      if(nx===save.playerX&&ny===save.playerY) continue;       // 玩家格
       var occ=false;
       for(var j=0;j<save.monsters.length;j++){
         var o=save.monsters[j];
         if(!o.alive||o===m) continue;
-        if(o.x===nx&&o.y===ny){occ=true;break;}
+        if(o.x===nx&&o.y===ny){ occ=true; break; }             // 其他怪物
       }
       if(occ) continue;
-      m.x=nx; m.y=ny;
-      m.dir=dirFromDelta(dirs[order[k]][0],dirs[order[k]][1]);
-      break;
+      allCands.push([dirs4[d][0],dirs4[d][1]]);
+      if(dist[ny][nx]<bestDist){ bestDist=dist[ny][nx]; bestCands.length=0; }
+      if(dist[ny][nx]===bestDist&&bestDist<INF) bestCands.push([dirs4[d][0],dirs4[d][1]]);
     }
+    if(allCands.length===0) continue;                          // 被包围 → 原地不动
+    var chosen;
+    if(bestCands.length>0&&Math.random()<0.7)
+      chosen=bestCands[Math.floor(Math.random()*bestCands.length)];
+    else
+      chosen=allCands[Math.floor(Math.random()*allCands.length)];
+    m.x+=chosen[0]; m.y+=chosen[1];
+    m.dir=dirFromDelta(chosen[0],chosen[1]);                   // 朝向跟随移动方向
   }
 }
 function runMonsterTurn(){
@@ -452,10 +479,15 @@ function runMonsterTurn(){
 function completeLevel(){
   toast('恭喜通关！');
   save.clearCount++;
+  // 通关恢复：HP/MP 各恢复当前剩余量的一半（向上取整），不超过职业上限；tempHP 不参与
+  var pcs=playerStats();
+  var hpGain=Math.ceil(save.playerHp/2);
+  save.playerHp+=hpGain; if(save.playerHp>pcs.hp) save.playerHp=pcs.hp;
+  var mpGain=Math.ceil(save.playerMp/2);
+  save.playerMp+=mpGain; if(save.playerMp>pcs.mp) save.playerMp=pcs.mp;
   mapGenerate();
   save.playerX=save.start.x; save.playerY=save.start.y;
   generateMonsters();
-  save.playerMp=playerStats().mp;
   battle={active:false,moving:false,targeting:false,moveCount:0};
   saveGame();
   redraw();
@@ -608,7 +640,7 @@ function handleMove(dx,dy){
   save.playerDir=dirFromDelta(dx,dy);
   if(nx===save.end.x&&ny===save.end.y){ completeLevel(); return; }
   if(newlyEnteredMonsterRange(oldX,oldY)){ enterBattle(true); return; }
-  moveMonstersRandomly();
+  moveMonstersTowardPlayer();
   if(anyMonsterInPlayerRange()){ enterBattle(false); return; }
   saveGame();
   redraw();
@@ -732,12 +764,14 @@ function drawSpriteBorder(px,py,size,color){
   ctx.strokeStyle=color; ctx.lineWidth=2;
   ctx.strokeRect(px-2,py-2,size+4,size+4);
 }
-function drawRangeGridCell(gx,gy,color){
+function drawRangeGridCell(gx,gy,fill,border){
   var px=gx*CELL, py=gy*CELL;
-  ctx.strokeStyle=color; ctx.lineWidth=1;
-  ctx.setLineDash([3,3]);
-  ctx.strokeRect(px+0.5,py+0.5,CELL-1,CELL-1);
-  ctx.setLineDash([]);
+  // 半透明色底块
+  ctx.fillStyle=fill;
+  ctx.fillRect(px,py,CELL,CELL);
+  // 高亮实线边框（内缩 1px 避免裁边）
+  ctx.strokeStyle=border; ctx.lineWidth=2;
+  ctx.strokeRect(px+1,py+1,CELL-2,CELL-2);
 }
 function drawMap(){
   ctx.fillStyle='rgb(20,24,32)'; ctx.fillRect(0,0,MAP_PX,MAP_PX);
@@ -772,20 +806,20 @@ function drawMonsters(){
   }
 }
 function drawAttackRanges(){
+  // 玩家攻击范围：绿色系半透明底块 + 亮绿实线边框
   for(var y=0;y<SIZE;y++){
     for(var x=0;x<SIZE;x++){
       if(inAttackRange(save.characterId,save.playerX,save.playerY,save.playerDir,x,y))
-        drawRangeGridCell(x,y,'rgb(70,220,70)');
+        drawRangeGridCell(x,y,'rgba(50,170,50,0.47)','rgb(70,255,70)');
     }
   }
-  if(battle.active){
-    for(var i=0;i<save.monsters.length;i++){
-      var m=save.monsters[i]; if(!m.alive) continue;
-      for(var y2=0;y2<SIZE;y2++){
-        for(var x2=0;x2<SIZE;x2++){
-          if(inAttackRange(m.type,m.x,m.y,m.dir,x2,y2))
-            drawRangeGridCell(x2,y2,'rgb(255,90,90)');
-        }
+  // 所有存活怪物攻击范围：红色系半透明底块 + 亮黄实线边框（探索与战斗阶段均显示）
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i]; if(!m.alive) continue;
+    for(var y2=0;y2<SIZE;y2++){
+      for(var x2=0;x2<SIZE;x2++){
+        if(inAttackRange(m.type,m.x,m.y,m.dir,x2,y2))
+          drawRangeGridCell(x2,y2,'rgba(210,50,50,0.47)','rgb(255,230,100)');
       }
     }
   }
