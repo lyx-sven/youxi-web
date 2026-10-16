@@ -30,6 +30,16 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
 #info-line2{color:#96a0be;font-size:13px;width:100%;line-height:1.4}
 #btn-menu{margin-left:auto;background:#4a5268;color:#fff;border:none;padding:6px 14px;font-family:inherit;font-size:14px;cursor:pointer}
 #btn-menu:active{background:#3a4152}
+/* 怪物血条区：玩家状态栏下方（与桌面版 DrawMonsterBars 布局一致：名称118px/血条116px/数值60px） */
+#monster-bars{width:100%;max-width:625px;background:#0e121a;padding:4px 8px;display:none;flex-direction:column;border-bottom:1px solid #1a1420}
+#monster-bars .mb-row{display:flex;align-items:center;height:18px;line-height:18px}
+#monster-bars .mb-name{width:118px;color:#ebc8c8;white-space:nowrap;overflow:hidden;font-size:12px}
+#monster-bars .mb-name.boss{color:#ffaa5a}
+#monster-bars .mb-bar-bg{width:116px;height:9px;background:#1a0c0e;margin:0 8px 0 4px;position:relative}
+#monster-bars .mb-bar-fill{position:absolute;left:0;top:0;height:100%;background:#dc4646}
+#monster-bars .mb-bar-fill.boss{background:#ff823c}
+#monster-bars .mb-hp{width:60px;color:#fff;font-size:12px}
+#monster-bars .mb-more{color:#96a0be;font-size:11px;height:16px;line-height:16px}
 #canvas-wrap{width:100%;max-width:625px;background:#141820;padding:8px}
 #game{width:100%;height:auto;display:block;image-rendering:pixelated;touch-action:manipulation;cursor:pointer}
 #battle-status{width:100%;max-width:625px;background:#282e3c;padding:8px 12px;font-size:20px;line-height:1.8;display:none;color:#ebf0fa}
@@ -72,6 +82,7 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
     <button class="menu-btn" id="btn-continue">继续游戏</button>
     <button class="menu-btn" id="btn-boss">Boss 预览</button>
     <button class="menu-btn" id="btn-boss2">Boss2 预览</button>
+    <button class="menu-btn" id="btn-boss3">Boss3 预览</button>
     <button class="menu-btn" id="btn-exit">退出游戏</button>
   </div>
 
@@ -93,6 +104,7 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
       <button id="btn-menu">菜单</button>
       <div id="info-line2"></div>
     </div>
+    <div id="monster-bars"></div>
     <div id="canvas-wrap"><canvas id="game" width="625" height="625"></canvas></div>
     <div id="battle-status"></div>
     <div id="battle-menu">
@@ -267,6 +279,34 @@ var BOSS2=[
 [0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0]];
 var PALETTE_BOSS2=[[0,0,0],[28,24,30],[232,190,150],[66,132,68],[112,72,42],[240,240,235],[150,220,150],[208,60,50],[70,112,224],[236,190,60]];
+/* Boss3 大元素使者（与 characters.h 一致） */
+var BOSS3=[
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,8,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,9,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,6,3,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,2,1,2,1,2,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,2,2,1,2,2,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,6,3,3,3,6,3,3,0,0,0,0,0,0,0,0],
+[0,0,0,0,7,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,8,0,0,0,0],
+[0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+[0,0,0,5,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,5,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,9,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,9,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+var PALETTE_BOSS3=[[0,0,0],[28,24,30],[232,190,150],[140,60,190],[90,40,130],[240,240,240],[200,150,240],[190,80,230],[70,130,230],[240,150,60]];
 /* 地图微粒：蓝菱 MP+1 / 红心 HP+2 */
 var BLUE_GEM=[
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -323,7 +363,7 @@ var RED_HEART=[
 var PICKUP_BLUE=[[0,0,0],[26,48,110],[90,150,255],[70,140,255],[130,200,255],[200,230,255],[225,245,255]];
 var PICKUP_RED=[[0,0,0],[100,22,34],[230,90,100],[235,70,80],[255,140,150],[255,190,195],[255,220,225]];
 var SPRITES=[WARRIOR,MAGE,ARCHER];
-var MONSTER_NAMES=['战士','法师','弓箭手','Boss','Boss2'];
+var MONSTER_NAMES=['战士','法师','弓箭手','Boss','Boss2','Boss3'];
 var CHAR_NAMES=['战士','法师','弓箭手'];
 
 /* ============ 常量 ============ */
@@ -341,10 +381,11 @@ var rewardPopup=false, rewardFromSkill=false;
 var playerHitUntil=0;
 var toastTimer=null;
 /* Boss 房间 / 预览隔离标志（与桌面版 main.cpp 语义一致，预览不写存档） */
-var bossPreview=false, boss2Preview=false;
+var bossPreview=false, boss2Preview=false, boss3Preview=false;
 var bossRoomActive=false, bossExitOpen=false, bossMoveCounter=0;
-var BOSS_TYPE=3, BOSS2_TYPE=4;
-var MONSTER_NAMES_BOSS=['Boss','Boss2'];
+var finalLevel=false;
+var BOSS_TYPE=3, BOSS2_TYPE=4, BOSS3_TYPE=5;
+var MONSTER_NAMES_BOSS=['Boss','Boss2','Boss3'];
 /* 攻击特效（与桌面版 main.cpp 一致：纯视觉叠加、约 400ms 自动清除；玩家/怪物共用同一队列） */
 var EFFECT_MS=400;
 var EFFECT_SLASH=0, EFFECT_ARROW=1, EFFECT_ORB=2;
@@ -359,6 +400,7 @@ function classStats(cls){
   if(cls===2) return {hp:5,atk:5,mp:4};
   if(cls===3) return {hp:25,atk:7,mp:0};
   if(cls===4) return {hp:25,atk:10,mp:0};
+  if(cls===5) return {hp:25,atk:10,mp:0};
   return {hp:7,atk:5,mp:2};
 }
 function playerStats(){
@@ -615,6 +657,54 @@ function rollBoss2Extra(m){ m.bowExtra=rand(16); }
 function boss2HitsPlayer(m,px,py){
   return boss2InFullRange(m,px,py)&&!boss2MissedAt(m,px,py);
 }
+/* ===== Boss3 大元素使者：随机元素范围 + 身边一格 nearDir 顺时针旋转（与桌面版 main.cpp 一致） ===== */
+function rollBoss3Elements(m){
+  m.elementCells=[];
+  var empty=[];
+  for(var y=0;y<SIZE;y++){
+    for(var x=0;x<SIZE;x++){
+      if(gridAt(x,y)!==0) continue;
+      if(x===m.x&&y===m.y) continue;
+      empty.push({x:x,y:y});
+    }
+  }
+  if(empty.length===0) return;
+  var count=20+rand(16);
+  if(count>empty.length) count=empty.length;
+  shuffle(empty);
+  for(var i=0;i<count;i++) m.elementCells.push({x:empty[i].x,y:empty[i].y});
+}
+function boss3NearCellAt(m,px,py){
+  var ndx=[0,1,1,1,0,-1,-1,-1];
+  var ndy=[-1,-1,0,1,1,1,0,-1];
+  var gx=m.x+ndx[m.nearDir], gy=m.y+ndy[m.nearDir];
+  if(gx<0||gx>=SIZE||gy<0||gy>=SIZE) return false;
+  if(gridAt(gx,gy)!==0) return false;
+  return px===gx&&py===gy;
+}
+function boss3HitsAt(m,px,py){
+  for(var i=0;i<m.elementCells.length;i++){
+    if(m.elementCells[i].x===px&&m.elementCells[i].y===py) return true;
+  }
+  return boss3NearCellAt(m,px,py);
+}
+/* 受击传送：Boss3 被玩家攻击命中后，传送到玩家攻击范围外的非墙空地并休息一轮（与桌面版 TeleportBoss3 一致） */
+function teleportBoss3(m){
+  var cand=[];
+  for(var y=0;y<SIZE;y++){
+    for(var x=0;x<SIZE;x++){
+      if(gridAt(x,y)!==0) continue;
+      if(x===m.x&&y===m.y) continue;
+      if(x===save.playerX&&y===save.playerY) continue;
+      if(inAttackRange(save.characterId,save.playerX,save.playerY,save.playerDir,x,y)) continue;
+      cand.push({x:x,y:y});
+    }
+  }
+  if(cand.length===0) return;
+  var p=cand[rand(cand.length)];
+  m.x=p.x; m.y=p.y;
+  m.nearDir=(m.nearDir+1)%8;
+}
 /* Boss 3x3 每回合随机缺一格（与桌面版 BossMissedAt 一致） */
 function bossMissedAt(m,px,py){
   var gx=m.x+(m.missIndex%3)-1;
@@ -643,6 +733,8 @@ function hasClearPath(ax,ay,bx,by){
 /* 统一怪物范围命中判定（与桌面版 MonsterRangeHits 一致，提示与判定共用失去格） */
 function monsterRangeHits(m,px,py){
   if(!m.alive) return false;
+  if(m.isBoss3&&m.type===BOSS3_TYPE)
+    return boss3HitsAt(m,px,py)&&hasClearPath(m.x,m.y,px,py);
   if(m.isBoss2&&m.type===BOSS2_TYPE)
     return boss2HitsPlayer(m,px,py)&&hasClearPath(m.x,m.y,px,py);
   if(m.isBoss&&m.type===BOSS_TYPE)
@@ -751,12 +843,15 @@ function moveMonstersTowardPlayer(){
       chosen=allCands[Math.floor(Math.random()*allCands.length)];
     m.x+=chosen[0]; m.y+=chosen[1];
     m.dir=dirFromDelta(chosen[0],chosen[1]);                   // 朝向跟随移动方向
+    if(m.isBoss3&&m.type===BOSS3_TYPE) m.nearDir=(m.nearDir+1)%8;  // 身边一格随移动顺时针旋转（与桌面版一致）
   }
 }
 function runMonsterTurn(){
   var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
   for(var i=0;i<save.monsters.length;i++){
     var m=save.monsters[i]; if(!m.alive) continue;
+    /* Boss3 受击传送后休息一轮（与桌面版 teleportSkip 一致） */
+    if(m.isBoss3&&m.type===BOSS3_TYPE&&m.teleportSkip){ m.teleportSkip=false; continue; }
     var inRange=inAttackRange(m.type,m.x,m.y,m.dir,save.playerX,save.playerY);
     var canAttack=false, bossMiss=false;
     /* Boss2 三弓神射手：当前弓完整范围-失去2格；命中/落空判定后按黄→蓝→红→黄切换并重掷下一轮状态（与桌面版一致） */
@@ -775,6 +870,17 @@ function runMonsterTurn(){
         bossMiss=bossMissedAt(m,save.playerX,save.playerY);
         canAttack=!bossMiss;
       }
+    } else if(m.isBoss3&&m.type===BOSS3_TYPE){
+      /* Boss3 大元素使者：命中判定=元素范围或身边一格且无墙；20% 施法失败不扣血并重掷元素范围（与桌面版一致） */
+      if(boss3HitsAt(m,save.playerX,save.playerY)&&hasClearPath(m.x,m.y,save.playerX,save.playerY)){
+        if(rand(100)<20){
+          rollBoss3Elements(m);
+          toast('元素使者施法失败');
+          continue;
+        }
+        canAttack=true;
+        rollBoss3Elements(m);
+      }
     } else if(inRange&&hasClearPath(m.x,m.y,save.playerX,save.playerY)){
       canAttack=true;
     }
@@ -785,10 +891,10 @@ function runMonsterTurn(){
     if(canAttack){
       /* 怪物攻击命中特效：与桌面版一致——战士类怪（普通 Warrior、Boss1 盔甲战士）→ 月牙，
          弓箭手类怪（普通 Archer、Boss2 三弓神射手）→ 白色箭头（从怪物指向玩家），
-         法师类怪（普通 Mage）→ 白色光球；约 400ms 自动清除，Miss/落空不触发 */
+         法师类怪（普通 Mage、Boss3 大元素使者）→ 白色光球；约 400ms 自动清除，Miss/落空不触发 */
       var ek=EFFECT_SLASH;
       if(m.type===2||(m.isBoss2&&m.type===BOSS2_TYPE)) ek=EFFECT_ARROW;
-      else if(m.type===1) ek=EFFECT_ORB;
+      else if(m.type===1||(m.isBoss3&&m.type===BOSS3_TYPE)) ek=EFFECT_ORB;
       addEffect(ek,m.x,m.y,save.playerX,save.playerY);
       var dmg=m.atk;
       if(save.tempHP>0){
@@ -829,21 +935,28 @@ function moveOneMonster(m,dirs){
     var c=cands[rand(n)];
     m.x+=c.dx; m.y+=c.dy;
     m.dir=dirFromDelta(c.dx,c.dy);
+    if(m.isBoss3&&m.type===BOSS3_TYPE) m.nearDir=(m.nearDir+1)%8;  // 身边一格随移动顺时针旋转（与桌面版一致）
   }
 }
 
 /* ============ Boss 房间 / 预览（与桌面版 SpawnBossRoom/StartBossPreview/StartFormalBossRoom 一致） ============ */
-function spawnBossRoom(boss2){
+function spawnBossRoom(boss2,boss3){
   bossRoomActive=true; bossExitOpen=false; bossMoveCounter=0;
-  save.monsters=[]; save.pickups=[];
+  save.monsters=[]; save.pickups=[]; save.levelKills=0;
   generateSparse(5,15);
   save.playerX=save.start.x; save.playerY=save.start.y;
-  var boss={type:(boss2?BOSS2_TYPE:BOSS_TYPE),x:0,y:0,hp:25,atk:(boss2?10:7),dir:DIR.UP,alive:true,isBoss:!boss2,isBoss2:boss2};
-  if(boss2){
+  var boss;
+  if(boss3){
+    /* Boss3 大元素使者：HP25 攻10，随机 20~35 格元素范围 + 身边一格 nearDir（与桌面版一致） */
+    boss={type:BOSS3_TYPE,x:0,y:0,hp:25,maxhp:25,atk:10,dir:DIR.UP,alive:true,isBoss:false,isBoss2:false,isBoss3:true,teleportSkip:false,nearDir:0,elementCells:[]};
+    rollBoss3Elements(boss);
+  }else if(boss2){
+    boss={type:BOSS2_TYPE,x:0,y:0,hp:25,maxhp:25,atk:10,dir:DIR.UP,alive:true,isBoss:false,isBoss2:true};
     boss.bowState=0;            /* 初始黄色弓 */
     rollBoss2Extra(boss);
     rollBoss2Moves(boss);
   }else{
+    boss={type:BOSS_TYPE,x:0,y:0,hp:25,maxhp:25,atk:7,dir:DIR.UP,alive:true,isBoss:true,isBoss2:false};
     boss.missIndex=rand(9);     /* 初始随机缺格 */
   }
   var empty=[];
@@ -862,23 +975,23 @@ function spawnBossRoom(boss2){
   else{ boss.x=save.playerX; boss.y=save.playerY; }
   save.monsters.push(boss);
 }
-function startBossPreview(boss2){
-  bossPreview=true; boss2Preview=boss2;
+function startBossPreview(boss2,boss3){
+  bossPreview=true; boss2Preview=boss2; boss3Preview=boss3;
   save.clearCount=0; save.kills=0; save.awarded=0;
   save.hpBonus=0; save.atkBonus=0; save.mpBonus=0;
   save.tempHP=(save.characterId===0)?3:0;
-  save.archerBuff=0;
+  save.archerBuff=0; save.levelKills=0;
   rewardPopup=false;
   var cs=playerStats();
   save.playerHp=cs.hp; save.playerMp=cs.mp;
   save.playerDir=DIR.UP;
-  spawnBossRoom(boss2);
+  spawnBossRoom(boss2,boss3);
   battle={active:false,moving:false,targeting:false,moveCount:0};
   screen='playing';
   redraw();
 }
-function startFormalBossRoom(){
-  spawnBossRoom(false);
+function startFormalBossRoom(boss2,boss3){
+  spawnBossRoom(boss2,boss3);
   battle={active:false,moving:false,targeting:false,moveCount:0};
   screen='playing';
   redraw();
@@ -927,7 +1040,6 @@ function spawnSinglePickupRandom(){
   var p=empty[rand(empty.length)];
   var kind=(rand(2)===0)?0:1;
   save.pickups.push({x:p.x,y:p.y,kind:kind});
-  toast(kind===0?'Boss 房间：生成蓝色微粒（MP+1）':'Boss 房间：生成红色微粒（HP+2）');
 }
 function tryPickupAt(x,y){
   for(var i=0;i<save.pickups.length;i++){
@@ -945,8 +1057,17 @@ function tryPickupAt(x,y){
 
 /* ============ 通关 / 死亡 ============ */
 function completeLevel(){
+  /* 最终关：走到出口 → 通关回主菜单（与桌面版 FinishFinalLevel 一致） */
+  if(finalLevel){ finishFinalLevel(); return; }
+  /* 处于 Boss3 房间（clearCount==25）且击杀后走到出口 → 进入最终关卡（与桌面版一致） */
+  if(save.clearCount===25&&bossExitOpen){ startFinalLevel(); return; }
   toast('恭喜通关！');
   save.clearCount++;
+  // 战士：按本关击杀数 levelKills 结算 tempHP 加成（桌面版：每 2 杀 +1，上限 99）
+  if(save.characterId===0&&save.levelKills>0){
+    var gain=Math.floor(save.levelKills/2);
+    save.tempHP+=gain; if(save.tempHP>99) save.tempHP=99;
+  }
   // 通关恢复：HP/MP 各恢复当前剩余量的一半（向上取整），不超过职业上限；tempHP 不参与
   var pcs=playerStats();
   var hpGain=Math.ceil(save.playerHp/2);
@@ -955,7 +1076,13 @@ function completeLevel(){
   save.playerMp+=mpGain; if(save.playerMp>pcs.mp) save.playerMp=pcs.mp;
   if(save.clearCount===9){
     /* clearCount==9 通关 → 第 10 关为第一 Boss 房间 */
-    startFormalBossRoom();
+    startFormalBossRoom(false,false);
+  }else if(save.clearCount===16){
+    /* clearCount==16 通关 → 第 17 关为第二 Boss（三弓神射手）房间 */
+    startFormalBossRoom(true,false);
+  }else if(save.clearCount===25){
+    /* clearCount==25 通关 → 第 25 关为第三 Boss（大元素使者）房间 */
+    startFormalBossRoom(false,true);
   }else{
     mapGenerate();
     save.playerX=save.start.x; save.playerY=save.start.y;
@@ -967,13 +1094,42 @@ function completeLevel(){
   if(!bossPreview) saveGame();
   redraw();
 }
+/* 最终关卡：5x15 全空地渐变过道，出生右中 (2,14)、出口左中 (2,0)，不写档并清档（与桌面版 StartFinalLevel 一致） */
+function startFinalLevel(){
+  save.mapGrid=[];
+  for(var i=0;i<SIZE*SIZE;i++) save.mapGrid.push(0);
+  save.start={x:14,y:2}; save.end={x:0,y:2};
+  save.playerX=14; save.playerY=2;
+  save.monsters=[]; save.pickups=[];
+  bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  effects=[];
+  finalLevel=true;
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  hasSave=false;
+  screen='playing';
+  toast('最终关卡：走到左侧出口，结束冒险！');
+  redraw();
+}
+/* 最终关通关：清档回主菜单（与桌面版 FinishFinalLevel 一致） */
+function finishFinalLevel(){
+  finalLevel=false;
+  bossPreview=false; boss2Preview=false; boss3Preview=false;
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  effects=[];
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  hasSave=false;
+  screen='menu';
+  redraw();
+  toast('恭喜通关！你已走完最终关卡，冒险完成。');
+}
 function playerDie(){
   save.tempHP=0; save.archerBuff=0;
   save.playerMp=playerStats().mp;
   battle={active:false,moving:false,targeting:false,moveCount:0};
   effects=[];  // 死亡返回主菜单：清空攻击特效，避免残留绘制
   if(!bossPreview) saveGame();
-  bossPreview=false; boss2Preview=false; bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
+  bossPreview=false; boss2Preview=false; boss3Preview=false; bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0; finalLevel=false;
   screen='menu';
   redraw();
   alert('你被怪物击败了……');
@@ -994,8 +1150,12 @@ function enterBattle(monsterFirst){
   redraw();
 }
 function saveBackToMenu(){
-  if(!bossPreview) saveGame();
-  bossPreview=false; boss2Preview=false; bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
+  if(finalLevel){
+    /* 最终关退出：不写档并清档（与桌面版 SaveAndBackToMenu 一致） */
+    try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    hasSave=false;
+  }else if(!bossPreview) saveGame();
+  bossPreview=false; boss2Preview=false; boss3Preview=false; bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0; finalLevel=false;
   battle={active:false,moving:false,targeting:false,moveCount:0};
   effects=[];  // 返回菜单：清空攻击特效，避免残留绘制
   screen='menu';
@@ -1032,7 +1192,7 @@ function doSkill(){
       t.hp-=dmg; hit++;
       if(t.hp<=0){
         t.alive=false; save.kills++;
-        saveGame();
+        if(!bossPreview) saveGame();
         if(Math.floor(save.kills/10)>save.awarded){
           rewardFromSkill=true; rewardPopup=true;
           showReward();
@@ -1044,7 +1204,7 @@ function doSkill(){
     toast('群攻发动！对 '+hit+' 只怪物造成 '+dmg+' 伤害');
     var allDead2=true;
     for(var i2=0;i2<save.monsters.length;i2++) if(save.monsters[i2].alive){allDead2=false;break;}
-    if(allDead2){ saveGame(); endBattle(true); return; }
+    if(allDead2){ if(!bossPreview) saveGame(); endBattle(true); return; }
   } else {
     var cost=Math.ceil(save.playerMp*2/3); if(cost<1) cost=1;
     if(save.playerMp<cost){ toast('MP 不足！'); redraw(); return; }
@@ -1052,7 +1212,7 @@ function doSkill(){
     save.archerBuff=cost;
     toast('强化！下次普攻伤害 +'+cost);
   }
-  saveGame();
+  if(!bossPreview) saveGame();
   redraw();
 }
 
@@ -1071,7 +1231,7 @@ function finishAttackTurn(){
   if(allDead){ endBattle(true); return; }
   if(runMonsterTurn()){ playerDie(); return; }
   battle.moveCount=0; battle.moving=false; battle.targeting=false;
-  saveGame();
+  if(!bossPreview) saveGame();
   redraw();
 }
 function attackMonster(target){
@@ -1082,10 +1242,18 @@ function attackMonster(target){
   var ek=(save.characterId===2)?EFFECT_ARROW:(save.characterId===1)?EFFECT_ORB:EFFECT_SLASH;
   addEffect(ek,save.playerX,save.playerY,target.x,target.y);
   target.hp-=atk;
+  /* Boss3 受击传送：命中后传送到玩家攻击范围外并休息一轮（与桌面版 TeleportBoss3 一致） */
+  if(target.hp>0&&target.isBoss3&&target.type===BOSS3_TYPE){
+    teleportBoss3(target);
+    rollBoss3Elements(target);
+    target.teleportSkip=true;
+    toast('元素使者受到攻击后传送离开！');
+  }
   if(target.hp<=0){
     target.alive=false;
     save.kills++;
-    saveGame();
+    save.levelKills++;
+    if(!bossPreview) saveGame();
     if(Math.floor(save.kills/10)>save.awarded){
       rewardFromSkill=false;
       rewardPopup=true;
@@ -1103,7 +1271,7 @@ function chooseReward(choice){
   save.awarded++;
   rewardPopup=false;
   hideReward();
-  saveGame();
+  if(!bossPreview) saveGame();
   if(rewardFromSkill){
     rewardFromSkill=false;
     battle.moveCount=0; battle.moving=false; battle.targeting=false;
@@ -1118,7 +1286,12 @@ function chooseReward(choice){
 
 /* ============ 移动 ============ */
 function tryStep(nx,ny){
-  if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) return false;
+  /* 最终关：5x15 渐变过道，禁止走出 15 列 × 5 行边界（与桌面版一致） */
+  if(finalLevel){
+    if(nx<0||nx>=15||ny<0||ny>=5) return false;
+  }else{
+    if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) return false;
+  }
   if(gridAt(nx,ny)===1) return false;
   for(var i=0;i<save.monsters.length;i++){ var m=save.monsters[i]; if(m.alive&&m.x===nx&&m.y===ny) return false; }
   return true;
@@ -1144,7 +1317,7 @@ function handleMove(dx,dy){
   if(newlyEnteredMonsterRange(oldX,oldY)){ enterBattle(true); return; }
   moveMonstersTowardPlayer();
   if(anyMonsterInPlayerRange()){ enterBattle(false); return; }
-  saveGame();
+  if(!bossPreview) saveGame();
   redraw();
 }
 function handleBattleMove(dx,dy){
@@ -1169,22 +1342,22 @@ function handleBattleMove(dx,dy){
   if(newlyEnteredMonsterRange(oldX,oldY)){
     if(runMonsterTurn()){ playerDie(); return; }
     battle.moveCount=0; battle.moving=false;
-    saveGame(); redraw();
+    if(!bossPreview) saveGame(); redraw();
     return;
   }
   if(!anyMonsterInPlayerRange()&&!anyMonsterCanAttackPlayer()){
     endBattle(false);
-    saveGame();
+    if(!bossPreview) saveGame();
     return;
   }
   if(battle.moveCount>=2){
     if(runMonsterTurn()){ playerDie(); return; }
     battle.moveCount=0; battle.moving=false;
-    saveGame(); redraw();
+    if(!bossPreview) saveGame(); redraw();
     return;
   }
   battle.moving=false;
-  saveGame();
+  if(!bossPreview) saveGame();
   redraw();
 }
 
@@ -1196,6 +1369,7 @@ function saveGame(){
     clearCount:save.clearCount, kills:save.kills, awarded:save.awarded,
     hpBonus:save.hpBonus, atkBonus:save.atkBonus, mpBonus:save.mpBonus,
     playerMp:save.playerMp, tempHP:save.tempHP, archerBuff:save.archerBuff,
+    levelKills:save.levelKills||0,
     mapGrid:save.mapGrid, start:save.start, end:save.end, monsters:save.monsters,
     pickups:save.pickups||[]
   };
@@ -1209,7 +1383,7 @@ function chooseChar(cls){
   save={
     characterId:cls, playerX:0, playerY:0, playerHp:0, playerDir:DIR.UP,
     clearCount:0, kills:0, awarded:0, hpBonus:0, atkBonus:0, mpBonus:0,
-    playerMp:0, tempHP:0, archerBuff:0, mapGrid:[], start:{x:0,y:0}, end:{x:0,y:0}, monsters:[], pickups:[]
+    playerMp:0, tempHP:0, archerBuff:0, levelKills:0, mapGrid:[], start:{x:0,y:0}, end:{x:0,y:0}, monsters:[], pickups:[]
   };
   var cs=playerStats();
   save.playerHp=cs.hp; save.playerMp=cs.mp;
@@ -1219,6 +1393,8 @@ function chooseChar(cls){
   battle={active:false,moving:false,targeting:false,moveCount:0};
   effects=[];  // 新游戏开始：清空攻击特效
   rewardPopup=false;
+  bossPreview=false; boss2Preview=false; boss3Preview=false; finalLevel=false;
+  bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
   saveGame();
   screen='playing';
   redraw();
@@ -1232,8 +1408,8 @@ function loadGame(){
     save={characterId:d.characterId, playerX:d.playerX, playerY:d.playerY, playerHp:d.playerHp,
       playerDir:d.playerDir, clearCount:d.clearCount, kills:d.kills, awarded:d.awarded,
       hpBonus:d.hpBonus, atkBonus:d.atkBonus, mpBonus:d.mpBonus, playerMp:d.playerMp,
-      tempHP:d.tempHP, archerBuff:d.archerBuff, mapGrid:d.mapGrid, start:d.start, end:d.end,
-      monsters:d.monsters||[], pickups:d.pickups||[]};
+      tempHP:d.tempHP, archerBuff:d.archerBuff, levelKills:d.levelKills||0, mapGrid:d.mapGrid,
+      start:d.start, end:d.end, monsters:d.monsters||[], pickups:d.pickups||[]};
   }catch(e){ return false; }
   if(!save.mapGrid||save.mapGrid.length!==SIZE*SIZE) return false;
   var pcs=playerStats();
@@ -1242,25 +1418,35 @@ function loadGame(){
   if(save.tempHP<0) save.tempHP=0;
   if(save.tempHP>99) save.tempHP=99;
   if(save.archerBuff<0) save.archerBuff=0;
+  if(save.levelKills<0) save.levelKills=0;
   for(var i=0;i<save.monsters.length;i++){
     var m=save.monsters[i];
-    if(m.isBoss&&m.type===BOSS_TYPE){ m.hp=Math.min(25,m.hp); m.atk=7; continue; }
-    if(m.isBoss2&&m.type===BOSS2_TYPE){ m.hp=Math.min(25,m.hp); m.atk=10; continue; }
+    if(m.isBoss&&m.type===BOSS_TYPE){ m.hp=Math.min(25,m.hp); m.atk=7; m.maxhp=25; continue; }
+    if(m.isBoss2&&m.type===BOSS2_TYPE){ m.hp=Math.min(25,m.hp); m.atk=10; m.maxhp=25; continue; }
+    if(m.isBoss3&&m.type===BOSS3_TYPE){
+      m.hp=Math.min(25,m.hp); m.atk=10; m.maxhp=25;
+      if(!m.elementCells||!m.elementCells.length) rollBoss3Elements(m);
+      if(typeof m.nearDir!=='number') m.nearDir=0;
+      if(typeof m.teleportSkip!=='boolean') m.teleportSkip=false;
+      continue;
+    }
     var mcs=classStats(m.type);
     var growth=Math.floor(save.clearCount/3);
     if(m.hp<=0||m.hp>mcs.hp+growth||m.atk<=0||m.atk>Math.ceil(mcs.atk/2)+growth){
       m.hp=mcs.hp; m.atk=Math.ceil(mcs.atk/2);
       applyMonsterGrowth(m,save.clearCount);
     }
+    m.maxhp=m.hp;
   }
   if(save.monsters.length===0) generateMonsters();
-  // Boss 房标志恢复：存档怪物含 Boss/Boss2 视为处于 Boss 房间（桌面版语义，出口/步数计数重建）
+  // Boss 房标志恢复：存档怪物含 Boss/Boss2/Boss3 视为处于 Boss 房间（桌面版语义，出口/步数计数重建）
   bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
   for(var bi=0;bi<save.monsters.length;bi++){
     var bm=save.monsters[bi];
-    if(bm.alive&&((bm.isBoss&&bm.type===BOSS_TYPE)||(bm.isBoss2&&bm.type===BOSS2_TYPE))){ bossRoomActive=true; break; }
+    if(bm.alive&&((bm.isBoss&&bm.type===BOSS_TYPE)||(bm.isBoss2&&bm.type===BOSS2_TYPE)||(bm.isBoss3&&bm.type===BOSS3_TYPE))){ bossRoomActive=true; break; }
   }
   battle={active:false,moving:false,targeting:false,moveCount:0};
+  bossPreview=false; boss2Preview=false; boss3Preview=false; finalLevel=false;
   screen='playing';
   redraw();
   return true;
@@ -1290,14 +1476,30 @@ function drawSpriteBorder(px,py,size,color){
 }
 function drawRangeGridCell(gx,gy,fill,border){
   var px=gx*CELL, py=gy*CELL;
-  // 半透明色底块
+  // 半透明色底块：与桌面版 AlphaBlend 约 35% 不透明度一致
+  ctx.globalAlpha=0.35;
   ctx.fillStyle=fill;
   ctx.fillRect(px,py,CELL,CELL);
+  ctx.globalAlpha=1;
   // 高亮实线边框（内缩 1px 避免裁边）
   ctx.strokeStyle=border; ctx.lineWidth=2;
   ctx.strokeRect(px+1,py+1,CELL-2,CELL-2);
 }
 function drawMap(){
+  /* 最终关：5x15 全空地，按列暗红→浅绿渐变（与桌面版 DrawMap FinalLevel 一致，仅标出口） */
+  if(finalLevel){
+    for(var fy=0;fy<5;fy++){
+      for(var fx=0;fx<15;fx++){
+        var t=(fx/14);
+        var r=Math.round(90+30*t), g=Math.round(25+175*t), b=Math.round(20+110*t);
+        ctx.fillStyle='rgb('+r+','+g+','+b+')';
+        ctx.fillRect(fx*CELL,fy*CELL,CELL,CELL);
+      }
+    }
+    ctx.font='bold 14px Courier New'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='rgb(200,30,30)'; ctx.fillText('出口',save.end.x*CELL+CELL/2,save.end.y*CELL+CELL/2);
+    return;
+  }
   // 黑红砖墙/路径材质（与桌面版 DrawMap 一致：砖缝黑底+暗红砖3层错缝 / 深黑灰底+暗红点缀）
   ctx.fillStyle='rgb(18,14,20)'; ctx.fillRect(0,0,MAP_PX,MAP_PX);
   for(var y=0;y<SIZE;y++){
@@ -1364,17 +1566,26 @@ function drawMonsters(){
       // Boss2 三弓神射手：专属造型 + 调色板
       drawSprite(BOSS2,m.x*CELL,m.y*CELL,1,PALETTE_BOSS2);
       drawBossInfo(m);
+    }else if(m.isBoss3&&m.type===BOSS3_TYPE){
+      // Boss3 大元素使者：专属造型 + 调色板
+      drawSprite(BOSS3,m.x*CELL,m.y*CELL,1,PALETTE_BOSS3);
+      drawBossInfo(m);
     }else{
       drawSprite(SPRITES[m.type],m.x*CELL,m.y*CELL,1,PALETTE_RED);
     }
     if(battle.active) drawSpriteBorder(m.x*CELL,m.y*CELL,25,'rgb(255,220,60)');
   }
 }
-/* Boss 头顶信息：HP:x/25 攻:x（Boss2 追加当前弓名），顶部留白不足时下移（与桌面版一致） */
+/* Boss 头顶信息：HP:x/25 攻:x（Boss2 追加当前弓名；Boss3 显示元素使者），顶部留白不足时下移（与桌面版一致） */
 function drawBossInfo(m){
-  var is2=(m.isBoss2&&m.type===BOSS2_TYPE);
-  var s='HP:'+m.hp+'/25 攻:'+m.atk;
-  if(is2){ var bn=(m.bowState===0)?'黄弓':(m.bowState===1)?'蓝弓':'红弓'; s+=' '+bn; }
+  var maxhp=(m.maxhp)?m.maxhp:25;
+  var s;
+  if(m.isBoss3&&m.type===BOSS3_TYPE) s='元素使者 HP:'+m.hp+'/'+maxhp+' 攻:'+m.atk;
+  else if(m.isBoss2&&m.type===BOSS2_TYPE){
+    s='Boss2 HP:'+m.hp+'/'+maxhp+' 攻:'+m.atk;
+    var bn=(m.bowState===0)?'黄弓':(m.bowState===1)?'蓝弓':'红弓'; s+=' '+bn;
+  }
+  else s='Boss HP:'+m.hp+'/'+maxhp+' 攻:'+m.atk;
   var tx=m.x*CELL, ty=m.y*CELL;
   var textY=ty-18;
   if(textY<10) textY=10;
@@ -1394,14 +1605,14 @@ function drawPickups(){
   }
 }
 function drawAttackRanges(){
-  // 玩家攻击范围：亮青色系半透明底块 + 高亮框（与桌面版一致）
+  // 玩家攻击范围：淡青底 rgba≈0.35 + 高亮框（桌面值 RGB(0,150,120)/RGB(85,190,165)）
   for(var y=0;y<SIZE;y++){
     for(var x=0;x<SIZE;x++){
       if(inAttackRange(save.characterId,save.playerX,save.playerY,save.playerDir,x,y))
-        drawRangeGridCell(x,y,'rgba(0,200,160,0.45)','rgb(110,255,220)');
+        drawRangeGridCell(x,y,'rgb(0,150,120)','rgb(85,190,165)');
     }
   }
-  // 所有存活怪物攻击范围：亮橙底 + 亮黄框（探索与战斗阶段均显示）
+  // 所有存活怪物攻击范围：淡橙底 + 橙黄框（探索与战斗阶段均显示；仅显示无墙可命中格）
   for(var i=0;i<save.monsters.length;i++){
     var m=save.monsters[i]; if(!m.alive) continue;
     if(m.isBoss2&&m.type===BOSS2_TYPE){
@@ -1416,7 +1627,17 @@ function drawAttackRanges(){
           ctx.fillStyle='rgb(200,190,210)';
           ctx.fillText('×',c.x*CELL+CELL/2,c.y*CELL+CELL/2);
         }else{
-          drawRangeGridCell(c.x,c.y,'rgba(230,120,25,0.5)','rgb(255,225,80)');
+          drawRangeGridCell(c.x,c.y,'rgb(170,95,20)','rgb(195,175,65)');
+        }
+      }
+      continue;
+    }
+    if(m.isBoss3&&m.type===BOSS3_TYPE){
+      // Boss3：元素范围 + 身边一格（无墙可命中格，与判定共用 boss3HitsAt）
+      for(var y3=0;y3<SIZE;y3++){
+        for(var x3=0;x3<SIZE;x3++){
+          if(boss3HitsAt(m,x3,y3)&&hasClearPath(m.x,m.y,x3,y3))
+            drawRangeGridCell(x3,y3,'rgb(170,95,20)','rgb(195,175,65)');
         }
       }
       continue;
@@ -1425,7 +1646,8 @@ function drawAttackRanges(){
       for(var x2=0;x2<SIZE;x2++){
         if(!inAttackRange(m.type,m.x,m.y,m.dir,x2,y2)) continue;
         if(m.isBoss&&m.type===BOSS_TYPE&&bossMissedAt(m,x2,y2)) continue; // 缺格不显示
-        drawRangeGridCell(x2,y2,'rgba(230,120,25,0.5)','rgb(255,225,80)');
+        if(!hasClearPath(m.x,m.y,x2,y2)) continue;                          // 隔墙不显示（与判定一致）
+        drawRangeGridCell(x2,y2,'rgb(170,95,20)','rgb(195,175,65)');
       }
     }
   }
@@ -1509,12 +1731,17 @@ function updateTop(){
   for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive) alive++;
   var l1='角色: '+CHAR_NAMES[save.characterId]+'  通关: '+save.clearCount+'  怪物: '+alive;
   if(battle.active) l1+='  [战斗中]';
+  if(bossPreview&&boss3Preview) l1+='  [Boss3预览]';
+  else if(bossPreview&&boss2Preview) l1+='  [Boss2预览]';
+  else if(bossPreview) l1+='  [Boss预览]';
   document.getElementById('info-line1').textContent=l1;
   var l2;
   if(battle.active){
     l2=battle.targeting?'目标选择：点击攻击范围内的怪物'
       :battle.moving?'移动中：按 WASD/方向键移动一格'
       :'战斗中：选择 攻击 / 移动 / 技能 / 背包';
+  }else if(finalLevel){
+    l2='最终关卡：走到左侧出口结束冒险';
   }else if(bossExitOpen){
     l2='Boss 已被击败！走到绿色出口进入下一关';
   }else if(bossRoomActive){
@@ -1549,8 +1776,11 @@ function updateBattleUI(){
       var mname=MONSTER_NAMES[m.type];
       if(m.isBoss2&&m.type===BOSS2_TYPE){
         mname+='('+((m.bowState===0)?'黄弓':(m.bowState===1)?'蓝弓':'红弓')+')';
+      }else if(m.isBoss3&&m.type===BOSS3_TYPE){
+        mname='元素使者';
       }
-      h+='<div>'+mname+'#'+idx+++' HP'+m.hp+'/'+(c.hp+Math.floor(save.clearCount/3))+' ATK'+m.atk+'</div>';
+      var mhp=(m.maxhp)?m.maxhp:(c.hp+Math.floor(save.clearCount/3));
+      h+='<div>'+mname+'#'+idx+++' HP'+m.hp+'/'+mhp+' ATK'+m.atk+'</div>';
     }
     bs.innerHTML=h;
   }
@@ -1591,7 +1821,34 @@ function redraw(){
     document.getElementById('screen-playing').classList.add('active');
     updateBattleUI();
     drawPlaying();
+    updateMonsterBars();
   }
+}
+/* 怪物血条区：状态栏下方最多 5 行，普通怪红条、Boss 橙红条，名称+血条+HP 数值，死亡移除（与桌面版一致） */
+function updateMonsterBars(){
+  var box=document.getElementById('monster-bars');
+  if(!box) return;
+  if(!save){ box.style.display='none'; return; }
+  var rows=[];
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i];
+    if(!m.alive) continue;
+    var isB=(m.isBoss||m.isBoss2||m.isBoss3);
+    var name;
+    if(m.isBoss3&&m.type===BOSS3_TYPE) name='元素使者';
+    else if(m.isBoss2&&m.type===BOSS2_TYPE) name='Boss2('+((m.bowState===0)?'黄弓':(m.bowState===1)?'蓝弓':'红弓')+')';
+    else if(m.isBoss&&m.type===BOSS_TYPE) name='Boss';
+    else name=MONSTER_NAMES[m.type];
+    var maxhp=(m.maxhp)?m.maxhp:25;
+    var pct=Math.max(0,Math.min(100,Math.round(m.hp/maxhp*100)));
+    var row='<div class="mb-row"><span class="mb-name'+(isB?' boss':'')+'">'+name+'</span>'
+      +'<span class="mb-bar-bg"><span class="mb-bar-fill'+(isB?' boss':'')+'" style="width:'+pct+'%"></span></span>'
+      +'<span class="mb-hp">'+m.hp+'/'+maxhp+'</span></div>';
+    rows.push(row);
+    if(rows.length>=5) break;
+  }
+  if(rows.length===0){ box.style.display='none'; }
+  else{ box.style.display='block'; box.innerHTML=rows.join(''); }
 }
 
 /* ============ 事件 ============ */
@@ -1600,8 +1857,9 @@ bind('btn-new',function(){ newGame(); });
 bind('btn-continue',function(){ continueGame(); });
 bind('btn-exit',function(){ saveGame(); toast('已保存，可关闭页面退出'); });
 bind('btn-menu',function(){ saveBackToMenu(); });
-bind('btn-boss',function(){ if(!save) save={characterId:0}; startBossPreview(false); });
-bind('btn-boss2',function(){ if(!save) save={characterId:0}; startBossPreview(true); });
+bind('btn-boss',function(){ if(!save) save={characterId:0}; startBossPreview(false,false); });
+bind('btn-boss2',function(){ if(!save) save={characterId:0}; startBossPreview(true,false); });
+bind('btn-boss3',function(){ if(!save) save={characterId:0}; startBossPreview(false,true); });
 bind('bm-attack',function(){ if(rewardPopup)return; doAttack(); });
 bind('bm-move',function(){ if(rewardPopup)return; doMove(); });
 bind('bm-skill',function(){ if(rewardPopup)return; doSkill(); });
