@@ -24,14 +24,14 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
 .card-name{color:#fff;font-size:22px;margin-top:6px;font-weight:bold}
 .card-sub{color:#96a0be;font-size:12px;margin-top:2px}
 #screen-playing{width:100%;align-items:center}
-#topbar{width:100%;max-width:625px;background:#2a2e3c;padding:6px 10px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;position:relative}
+#topbar{width:100%;max-width:615px;background:#2a2e3c;padding:6px 10px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;position:relative}
 #stat-hp{color:#ffe650;font-weight:bold;font-size:22px;line-height:1.4}
 #info-line1{color:#e6ebf5;font-size:15px;line-height:1.4}
 #info-line2{color:#96a0be;font-size:13px;width:100%;line-height:1.4}
 #btn-menu{margin-left:auto;background:#4a5268;color:#fff;border:none;padding:6px 14px;font-family:inherit;font-size:14px;cursor:pointer}
 #btn-menu:active{background:#3a4152}
 /* 怪物血条区：玩家状态栏下方（与桌面版 DrawMonsterBars 布局一致：名称118px/血条116px/数值60px） */
-#monster-bars{width:100%;max-width:625px;background:#0e121a;padding:4px 8px;display:none;flex-direction:column;border-bottom:1px solid #1a1420}
+#monster-bars{width:100%;max-width:615px;background:#0e121a;padding:4px 8px;display:none;flex-direction:column;border-bottom:1px solid #1a1420}
 #monster-bars .mb-row{display:flex;align-items:center;height:18px;line-height:18px}
 #monster-bars .mb-name{width:118px;color:#ebc8c8;white-space:nowrap;overflow:hidden;font-size:12px}
 #monster-bars .mb-name.boss{color:#ffaa5a}
@@ -40,17 +40,17 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
 #monster-bars .mb-bar-fill.boss{background:#ff823c}
 #monster-bars .mb-hp{width:60px;color:#fff;font-size:12px}
 #monster-bars .mb-more{color:#96a0be;font-size:11px;height:16px;line-height:16px}
-#canvas-wrap{width:100%;max-width:625px;background:#141820;padding:8px}
+#canvas-wrap{width:100%;max-width:615px;background:#141820;padding:8px}
 #game{width:100%;height:auto;display:block;image-rendering:pixelated;touch-action:manipulation;cursor:pointer}
-#battle-status{width:100%;max-width:625px;background:#282e3c;padding:8px 12px;font-size:20px;line-height:1.8;display:none;color:#ebf0fa}
+#battle-status{width:100%;max-width:615px;background:#282e3c;padding:8px 12px;font-size:20px;line-height:1.8;display:none;color:#ebf0fa}
 #battle-status .bs-title{color:#ffdc78;font-size:14px;text-align:center}
 #battle-status .bs-player{color:#ffe650;font-weight:bold;font-size:22px}
-#battle-menu{width:100%;max-width:625px;display:none;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 0}
+#battle-menu{width:100%;max-width:615px;display:none;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 0}
 #battle-menu.active{display:grid}
 #battle-menu button{height:54px;font-size:22px;color:#fff;background:#463c50;border:none;font-family:inherit;cursor:pointer;letter-spacing:4px}
 #battle-menu button:active{background:#5a4c66}
 #battle-menu button.hl{background:#b45a1e}
-#controls{width:100%;max-width:625px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px 24px;gap:10px}
+#controls{width:100%;max-width:615px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px 24px;gap:10px}
 #dpad{display:grid;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(3,60px);gap:5px}
 #dpad .up{grid-column:2;grid-row:1}
 #dpad .left{grid-column:1;grid-row:2}
@@ -69,6 +69,25 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
 .panel button{width:150px;height:58px;margin:8px;font-size:20px;background:#3c5a8c;color:#fff;border:none;cursor:pointer;font-family:inherit}
 .panel button:active{background:#2b4470}
 .modal-note{color:#96a0be;font-size:13px;margin-top:12px}
+/* 周目选角：历史已用角色灰卡不可选（与桌面版 usedCharacterIds 灰卡一致） */
+.card.used{background:#262834;border-color:#262834;cursor:default}
+.card.used:hover{border-color:#262834}
+.card.used .card-name{color:#8c8e98}
+/* 背包 / 白纸收藏页（与桌面版 DrawBagOverlay 布局语义一致） */
+#bag-body{text-align:left;color:#e6ebf5;font-size:15px;line-height:1.6;margin:6px 0 10px;min-height:60px}
+.bag-row{display:flex;align-items:center;justify-content:space-between;padding:7px 4px;border-bottom:1px solid #3a3f52}
+.bag-row .bag-desc{flex:1;color:#c8d0e2}
+.bag-row .bag-desc b{color:#ffdc78}
+.bag-row .bag-desc .used-tag{color:#8c8e98}
+.bag-row .bag-act{width:96px;margin-left:10px}
+.bag-row .bag-act button{width:100%;height:44px;font-size:17px;background:#3c5a8c;color:#fff;border:none;cursor:pointer;font-family:inherit}
+.bag-row .bag-act button:active{background:#2b4470}
+.bag-row .bag-act button.off{background:#454b5c}
+#bag-paper-list .bag-paper-item{color:#d8d8e0;padding:6px 4px;border-bottom:1px solid #33374a;font-size:15px;line-height:1.5}
+#bag-paper-list .bag-paper-item b{color:#ffdc78}
+#bag-uncollected{color:#96a0be;font-size:14px;padding:4px;margin-bottom:4px}
+#bag-empty-note{color:#96a0be;font-size:14px;padding:10px 4px}
+#bag-btns{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -105,7 +124,7 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
       <div id="info-line2"></div>
     </div>
     <div id="monster-bars"></div>
-    <div id="canvas-wrap"><canvas id="game" width="625" height="625"></canvas></div>
+    <div id="canvas-wrap"><canvas id="game" width="615" height="615"></canvas></div>
     <div id="battle-status"></div>
     <div id="battle-menu">
       <button id="bm-attack">攻击</button>
@@ -135,6 +154,15 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
       <button id="rw-atk">攻击 +1</button>
       <button id="rw-mp">MP +1</button>
       <div class="modal-note">点击后立即生效，并保存到存档</div>
+    </div>
+  </div>
+
+  <!-- 背包 / 白纸收藏页（与桌面版 DrawBagOverlay 一致：主视图 + 白纸收藏页两个子视图） -->
+  <div id="bag-modal" class="modal">
+    <div class="panel">
+      <div class="modal-title" id="bag-title">背包（E / Esc 关闭）</div>
+      <div id="bag-body"></div>
+      <div id="bag-btns"></div>
     </div>
   </div>
 
@@ -223,6 +251,52 @@ var ARCHER=[
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
 var PALETTE=[[0,0,0],[40,36,52],[240,210,170],[70,110,230],[230,180,80],[220,220,225],[255,255,180]];
 var PALETTE_RED=[[0,0,0],[44,28,32],[240,210,170],[205,34,34],[222,88,44],[255,126,122],[255,214,170]];
+/* 三周目变身：角色变黄（与桌面版 PALETTE_YELLOW 一致） */
+var PALETTE_YELLOW=[[0,0,0],[66,52,16],[240,214,170],[235,186,26],[255,220,90],[250,236,170],[255,250,200]];
+/* 周目选角：历史已用角色灰色调色板（与桌面版 PALETTE_GRAY 一致） */
+var PALETTE_GRAY=[[0,0,0],[46,48,56],[118,120,130],[104,106,116],[134,136,146],[150,152,162],[172,174,182]];
+/* 白纸拾取物 7 色调色板（与桌面版 PICKUP_WHITE 一致） */
+var PICKUP_WHITE=[[0,0,0],[78,80,88],[246,246,250],[238,240,246],[170,174,182],[142,146,156],[255,255,255]];
+/* 白纸像素造型：0透明/1深灰轮廓/3白面/4浅灰横线/5折角（与桌面版 WHITE_PAPER[25][25] 一致） */
+var WHITE_PAPER=[
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+[0,0,1,5,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,1,5,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,3,3,3,3,3,3,1,0],
+[0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,4,4,4,4,4,4,4,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+/* 白纸内容表：序号 1~9 对应「第 1/2/3/4/5/8/15/18 次加点后」与「击杀第 3 个 Boss 后」（与桌面版 WHITE_PAPER_CONTENTS 一致） */
+var WHITE_PAPER_CONTENTS=[
+'【意志 报告 叁】意识存活，【躯体】可以机械性的行动。',
+'【意志 报告 贰】实验品很适合【躯体】目前表现出完全适应的状态。',
+'【意志 报告 壹】【陷阱】成功捕获【猎物】【计划】开始，【躯体】已经就绪。',
+'【意志 报告 肆】【意识】产生不可控制性，【意识】控制大量【躯体】分化。',
+'【意志 报告 伍】【意识】失踪，已经启用所有可调动力量搜寻追捕。',
+'【意志 报告 陆】【意识】静静躺在【胚胎】内，危机解除。',
+'【意志 报告 柒】【躯体】已被完全掌控。',
+'【意志 报告 捌】【贤者】。',
+'【意志 报告 玖】。。。。。'];
+/* 白纸生成时机：击杀奖励发放次数 awarded 达到 1/2/3/4/5/8/15/18 各生成 1 张（与桌面版 PAPER_TRIGGER_AWARD 一致） */
+var PAPER_TRIGGER_AWARD=[1,2,3,4,5,8,15,18];
 /* Boss 盔甲战士（与 characters.h 一致） */
 var BOSS=[
 [0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -367,7 +441,7 @@ var MONSTER_NAMES=['战士','法师','弓箭手','Boss','Boss2','Boss3'];
 var CHAR_NAMES=['战士','法师','弓箭手'];
 
 /* ============ 常量 ============ */
-var CELL=25, SIZE=25, MAP_PX=625;
+var CELL=41, SIZE=15, MAP_PX=615;
 var HIT_RED_MS=800;
 var SAVE_KEY='youxi_save_v1';
 var DIR={UP:0,RIGHT:1,DOWN:2,LEFT:3};
@@ -384,6 +458,11 @@ var toastTimer=null;
 var bossPreview=false, boss2Preview=false, boss3Preview=false;
 var bossRoomActive=false, bossExitOpen=false, bossMoveCounter=0;
 var finalLevel=false;
+/* 周目循环白屏过渡：到达最终关出口后全屏白屏约 0.7 秒锁定全部输入，到期切到周目选角页（与桌面版 WHITE_FLASH_MS/g_whiteFlash/g_screenAfterWhite 一致） */
+var WHITE_FLASH_MS=700;
+var whiteFlash=false, screenAfterWhite='select';
+var runSelect=false;   /* 周目选角标志：二/三周目白屏过渡后进入选角页置 true（桌面版 g_runSelect） */
+var bagOpen=false, bagWhitePaperView=false;   /* 背包模态与白纸收藏页子视图（桌面版 g_bagOpen/g_bagWhitePaperView） */
 var BOSS_TYPE=3, BOSS2_TYPE=4, BOSS3_TYPE=5;
 var MONSTER_NAMES_BOSS=['Boss','Boss2','Boss3'];
 /* 攻击特效（与桌面版 main.cpp 一致：纯视觉叠加、约 400ms 自动清除；玩家/怪物共用同一队列） */
@@ -404,6 +483,8 @@ function classStats(cls){
   return {hp:7,atk:5,mp:2};
 }
 function playerStats(){
+  /* 三周目变身：数值全部 999（与桌面版 GetPlayerStats run3Transformed 一致） */
+  if(save.run3Transformed) return {hp:999,atk:999,mp:999};
   var c=classStats(save.characterId);
   c.hp+=save.hpBonus; c.atk+=save.atkBonus; c.mp+=save.mpBonus;
   return c;
@@ -754,8 +835,14 @@ function newlyEnteredMonsterRange(oldX,oldY){
 }
 
 /* ============ 怪物生成与成长 ============ */
+/* 成长倍数：1..level 中 5/8 的倍数关数（与桌面版 MonsterGrowthTimes 一致） */
+function monsterGrowthTimes(level){
+  var t=0;
+  for(var i=1;i<=level;i++){ if(i%5===0||i%8===0) t++; }
+  return t;
+}
 function applyMonsterGrowth(m,clearCount){
-  var times=Math.floor(clearCount/3);
+  var times=monsterGrowthTimes(clearCount);
   for(var i=0;i<times;i++){
     if(rand(2)===0) m.hp++; else m.atk++;
   }
@@ -792,7 +879,49 @@ function generateMonsters(){
     m.hp=cs.hp;
     m.atk=Math.ceil(cs.atk/2);
     applyMonsterGrowth(m,save.clearCount);
+    /* Boss 通关加成：正式通过的 Boss 关卡数累计 0~3，后续普通怪全属性 +bossCleared（与桌面版一致） */
+    m.hp+=save.bossCleared||0;
+    m.atk+=save.bossCleared||0;
+    m.maxhp=m.hp;   /* 血条满血基准 */
     save.monsters.push(m);
+  }
+  /* 微粒与怪物同步生成（与桌面版 GenerateMonsters 末尾调用 GeneratePickups 一致） */
+  generatePickupsForLevel();
+}
+/* 按当前关卡生成地图微粒（拾取物）：蓝菱恢复 1 MP、红心恢复 2 HP。
+   数量 = max(1, ceil(本关怪物总数/3))；蓝/红约各半随机分配；
+   排除障碍格/四面围墙格/起点格/终点格/玩家当前位置/怪物占位格，微粒彼此不重叠（与桌面版 GeneratePickups 一致） */
+function generatePickupsForLevel(){
+  save.pickups=[];
+  var monsterCount=save.monsters.length;
+  var count=Math.floor((monsterCount+2)/3);   // ceil(monsterCount/3)
+  if(count<1) count=1;                        // 每关至少 1 个
+  var empty=[];
+  for(var y=0;y<SIZE;y++){
+    for(var x=0;x<SIZE;x++){
+      if(gridAt(x,y)!==0) continue;
+      if(isSurroundedByWalls(x,y)) continue;
+      if(x===save.start.x&&y===save.start.y) continue;
+      if(x===save.end.x&&y===save.end.y) continue;
+      if(x===save.playerX&&y===save.playerY) continue;
+      var hasMonster=false;
+      for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive&&save.monsters[i].x===x&&save.monsters[i].y===y){hasMonster=true;break;}
+      if(hasMonster) continue;
+      empty.push({x:x,y:y});
+    }
+  }
+  var blue=Math.floor(count/2)+rand(2);       // 蓝菱数量约一半，剩余为红心
+  if(blue>count) blue=count;
+  var used=[]; for(var j=0;j<empty.length;j++) used.push(false);
+  var guard=0;
+  while(save.pickups.length<count && guard<count*200+500){
+    guard++;
+    if(empty.length===0) break;               // 极端情况：无可用空位
+    var idx=rand(empty.length);
+    if(used[idx]) continue;                   // 已被其他微粒占用 → 重试
+    var p=empty[idx];
+    save.pickups.push({x:p.x,y:p.y,kind:(save.pickups.length<blue)?0:1});  // 先放蓝菱，再放红心
+    used[idx]=true;
   }
 }
 // 探索阶段同步移动：玩家每移动一次，全场存活怪物统一向玩家靠近移动一格
@@ -945,18 +1074,20 @@ function spawnBossRoom(boss2,boss3){
   save.monsters=[]; save.pickups=[]; save.levelKills=0;
   generateSparse(5,15);
   save.playerX=save.start.x; save.playerY=save.start.y;
+  /* Boss 通关加成：正式通过的 Boss 关卡数累计 0~3，Boss 全属性 +bossCleared（预览时已在 startBossPreview 重置 0） */
+  var bossBonus=save.bossCleared||0;
   var boss;
   if(boss3){
     /* Boss3 大元素使者：HP25 攻10，随机 20~35 格元素范围 + 身边一格 nearDir（与桌面版一致） */
-    boss={type:BOSS3_TYPE,x:0,y:0,hp:25,maxhp:25,atk:10,dir:DIR.UP,alive:true,isBoss:false,isBoss2:false,isBoss3:true,teleportSkip:false,nearDir:0,elementCells:[]};
+    boss={type:BOSS3_TYPE,x:0,y:0,hp:25+bossBonus,maxhp:25+bossBonus,atk:10+bossBonus,dir:DIR.UP,alive:true,isBoss:false,isBoss2:false,isBoss3:true,teleportSkip:false,nearDir:0,elementCells:[]};
     rollBoss3Elements(boss);
   }else if(boss2){
-    boss={type:BOSS2_TYPE,x:0,y:0,hp:25,maxhp:25,atk:10,dir:DIR.UP,alive:true,isBoss:false,isBoss2:true};
+    boss={type:BOSS2_TYPE,x:0,y:0,hp:25+bossBonus,maxhp:25+bossBonus,atk:10+bossBonus,dir:DIR.UP,alive:true,isBoss:false,isBoss2:true};
     boss.bowState=0;            /* 初始黄色弓 */
     rollBoss2Extra(boss);
     rollBoss2Moves(boss);
   }else{
-    boss={type:BOSS_TYPE,x:0,y:0,hp:25,maxhp:25,atk:7,dir:DIR.UP,alive:true,isBoss:true,isBoss2:false};
+    boss={type:BOSS_TYPE,x:0,y:0,hp:25+bossBonus,maxhp:25+bossBonus,atk:7+bossBonus,dir:DIR.UP,alive:true,isBoss:true,isBoss2:false};
     boss.missIndex=rand(9);     /* 初始随机缺格 */
   }
   var empty=[];
@@ -981,6 +1112,7 @@ function startBossPreview(boss2,boss3){
   save.hpBonus=0; save.atkBonus=0; save.mpBonus=0;
   save.tempHP=(save.characterId===0)?3:0;
   save.archerBuff=0; save.levelKills=0;
+  save.bossCleared=0;   /* Boss 预览：已通过的 Boss 关卡数清零（预览不产生/不叠加 Boss 加成，与桌面版一致） */
   rewardPopup=false;
   var cs=playerStats();
   save.playerHp=cs.hp; save.playerMp=cs.mp;
@@ -1008,6 +1140,12 @@ function isSurroundedByWalls(gx,gy){
 /* 全灭结算：Boss 房击杀 Boss → 开绿出口停产微粒；普通关 → 战斗胜利（与桌面版 OnAllMonstersDead 一致） */
 function onAllMonstersDead(){
   if(bossRoomActive){
+    /* 正式流程击杀第 3 个 Boss（Boss3）后生成白纸 9（预览不计，与桌面版一致） */
+    var hasBoss3=false;
+    for(var bi=0;bi<save.monsters.length;bi++){
+      if(save.monsters[bi].isBoss3&&save.monsters[bi].type===BOSS3_TYPE){ hasBoss3=true; break; }
+    }
+    if(hasBoss3&&!bossPreview) spawnWhitePaper(9);
     toast('Boss 已被击败！通关出口已开启');
     bossRoomActive=false;
     bossExitOpen=true;
@@ -1046,17 +1184,127 @@ function tryPickupAt(x,y){
     var p=save.pickups[i];
     if(p.x===x&&p.y===y){
       var cs=playerStats();
-      if(p.kind===1){ save.playerHp=Math.min(cs.hp,save.playerHp+2); toast('获得红色微粒：HP+2'); }
-      else{ save.playerMp=Math.min(cs.mp,save.playerMp+1); toast('获得蓝色微粒：MP+1'); }
+      if(p.kind===5){
+        /* 白纸（kind=5）：拾取入背包收藏，仅首次拾取记录，移出地面标记（与桌面版 TryPickupAt 一致） */
+        var dup=false;
+        for(var wi=0;wi<save.whitePapersCollected.length;wi++){
+          if(save.whitePapersCollected[wi]===p.index){ dup=true; break; }
+        }
+        if(!dup){
+          save.whitePapersCollected.push(p.index);
+          toast('拾取白纸 '+p.index+'：已收入白纸收藏');
+        }else{
+          toast('白纸 '+p.index+' 已收集过');
+        }
+        save.groundPapers=removeGroundPaper(save.groundPapers,p.index);
+        save.pickups.splice(i,1);
+        saveGame();
+        return true;
+      }
+      if(p.kind===1){
+        /* 红心：收入背包（使用：HP+2），上限 3（与桌面版一致） */
+        save.bagHearts=Math.min(3,(save.bagHearts||0)+1);
+        toast('获得红色微粒：已收入背包（使用：HP+2）');
+      }else{
+        /* 蓝菱：收入背包（使用：MP+1），上限 10（与桌面版一致） */
+        save.bagGems=Math.min(10,(save.bagGems||0)+1);
+        toast('获得蓝色微粒：已收入背包（使用：MP+1）');
+      }
       save.pickups.splice(i,1);
+      saveGame();
       return true;
     }
   }
   return false;
 }
+function removeGroundPaper(list,index){
+  var out=[];
+  for(var i=0;i<list.length;i++){ if(list[i].index!==index) out.push(list[i]); }
+  return out;
+}
+/* 生成 1 张白纸（kind=5, index=paperIndex 1~9）：周边 3x3 可行空地优先（排除障碍/玩家格/怪物占位/已有拾取物），
+   无空位则全图随机空地兜底（排除四面围墙/起点/终点/怪物/拾取物）。每张每时机恰好 1 次，跨周目不重复
+   （与桌面版 SpawnWhitePaper 一致） */
+function spawnWhitePaper(paperIndex){
+  if(!save) return;
+  save.whitePaperGen=save.whitePaperGen||[0,0,0,0,0,0,0,0,0];
+  save.groundPapers=save.groundPapers||[];
+  if(save.whitePaperGen[paperIndex-1]) return;   /* 每张白纸每个时机恰好生成 1 次，跨周目不重复 */
+  var freeCell=function(x,y){
+    if(x<0||x>=SIZE||y<0||y>=SIZE) return false;
+    if(gridAt(x,y)!==0) return false;
+    if(x===save.playerX&&y===save.playerY) return false;
+    for(var mi=0;mi<save.monsters.length;mi++) if(save.monsters[mi].alive&&save.monsters[mi].x===x&&save.monsters[mi].y===y) return false;
+    for(var pi=0;pi<save.pickups.length;pi++) if(save.pickups[pi].x===x&&save.pickups[pi].y===y) return false;
+    return true;
+  };
+  var nx=-1, ny=-1, near=[];
+  for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){
+    if(dx===0&&dy===0) continue;
+    var cx=save.playerX+dx, cy=save.playerY+dy;
+    if(freeCell(cx,cy)) near.push({x:cx,y:cy});
+  }
+  if(near.length>0){ var np=near[rand(near.length)]; nx=np.x; ny=np.y; }
+  else{
+    var empty=[];
+    for(var y=0;y<SIZE;y++) for(var x=0;x<SIZE;x++){
+      if(gridAt(x,y)!==0) continue;
+      if(isSurroundedByWalls(x,y)) continue;
+      if(x===save.start.x&&y===save.start.y) continue;
+      if(x===save.end.x&&y===save.end.y) continue;
+      if(freeCell(x,y)) empty.push({x:x,y:y});
+    }
+    if(empty.length>0){ var gp=empty[rand(empty.length)]; nx=gp.x; ny=gp.y; }
+  }
+  if(nx<0){ toast('白纸 '+paperIndex+' 无处生成'); return; }
+  save.whitePaperGen[paperIndex-1]=1;
+  save.groundPapers.push({index:paperIndex,x:nx,y:ny});
+  save.pickups.push({x:nx,y:ny,kind:5,index:paperIndex});
+  toast('白纸 '+paperIndex+' 出现在附近！');
+  if(!bossPreview) saveGame();
+}
+/* 周目选角确认：未拾取白纸在新地图重新落位（周边一格优先，全图兜底；与桌面版选角分支一致） */
+function relayoutGroundPapers(){
+  if(!save.groundPapers||save.groundPapers.length===0) return;
+  var newList=[];
+  var freeCell2=function(x,y){
+    if(x<0||x>=SIZE||y<0||y>=SIZE) return false;
+    if(gridAt(x,y)!==0) return false;
+    if(x===save.playerX&&y===save.playerY) return false;
+    for(var mi=0;mi<save.monsters.length;mi++) if(save.monsters[mi].alive&&save.monsters[mi].x===x&&save.monsters[mi].y===y) return false;
+    for(var pi=0;pi<save.pickups.length;pi++) if(save.pickups[pi].x===x&&save.pickups[pi].y===y) return false;
+    return true;
+  };
+  for(var gi=0;gi<save.groundPapers.length;gi++){
+    var gp=save.groundPapers[gi];
+    var near=[]; var done=false;
+    for(var dy=-1;dy<=1&&!done;dy++) for(var dx=-1;dx<=1&&!done;dx++){
+      if(dx===0&&dy===0) continue;
+      var cx=save.playerX+dx, cy=save.playerY+dy;
+      if(freeCell2(cx,cy)){ near.push({x:cx,y:cy}); }
+    }
+    if(near.length>0){ var np=near[rand(near.length)]; gp.x=np.x; gp.y=np.y; done=true; }
+    if(!done){
+      var empty=[];
+      for(var y=0;y<SIZE;y++) for(var x=0;x<SIZE;x++){
+        if(gridAt(x,y)!==0) continue;
+        if(isSurroundedByWalls(x,y)) continue;
+        if(x===save.start.x&&y===save.start.y) continue;
+        if(x===save.end.x&&y===save.end.y) continue;
+        if(freeCell2(x,y)) empty.push({x:x,y:y});
+      }
+      if(empty.length>0){ var gp2=empty[rand(empty.length)]; gp.x=gp2.x; gp.y=gp2.y; }
+    }
+    newList.push({index:gp.index,x:gp.x,y:gp.y});
+    if(gp.x>=0&&gp.y>=0) save.pickups.push({x:gp.x,y:gp.y,kind:5,index:gp.index});
+  }
+  save.groundPapers=newList;
+}
 
 /* ============ 通关 / 死亡 ============ */
 function completeLevel(){
+  /* 走到 Boss 房间出口（非预览）：Boss 通关加成 +1，上限 3（与桌面版一致；预览不计数） */
+  if(bossExitOpen&&!bossPreview&&(save.bossCleared<3)) save.bossCleared++;
   /* 最终关：走到出口 → 通关回主菜单（与桌面版 FinishFinalLevel 一致） */
   if(finalLevel){ finishFinalLevel(); return; }
   /* 处于 Boss3 房间（clearCount==25）且击杀后走到出口 → 进入最终关卡（与桌面版一致） */
@@ -1111,17 +1359,31 @@ function startFinalLevel(){
   toast('最终关卡：走到左侧出口，结束冒险！');
   redraw();
 }
-/* 最终关通关：清档回主菜单（与桌面版 FinishFinalLevel 一致） */
+/* 最终关通关：第三次通关弹祝贺窗并清档回主菜单；第一/二次通关白屏过渡 → 周目选角（与桌面版 FinishFinalLevel 一致） */
 function finishFinalLevel(){
   finalLevel=false;
   bossPreview=false; boss2Preview=false; boss3Preview=false;
   battle={active:false,moving:false,targeting:false,moveCount:0};
   effects=[];
-  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
-  hasSave=false;
-  screen='menu';
+  if(save.runCount>=3){
+    /* 第三次通关（第三周目走出最终关出口）：祝贺弹窗 → 清档回主菜单 */
+    try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    hasSave=false;
+    screen='menu';
+    redraw();
+    alert('恭喜通关！你已历经三次周目循环，冒险完成。');
+    return;
+  }
+  /* 第一/二次通关：白屏过渡（约 0.7 秒，期间锁定全部输入）→ 进入周目选角页 */
+  whiteFlash=true;
+  screenAfterWhite='select';
   redraw();
-  toast('恭喜通关！你已走完最终关卡，冒险完成。');
+  setTimeout(function(){
+    whiteFlash=false;
+    runSelect=true;
+    screen='select';
+    redraw();
+  },WHITE_FLASH_MS);
 }
 function playerDie(){
   save.tempHP=0; save.archerBuff=0;
@@ -1142,10 +1404,16 @@ function endBattle(victory){
   }
   redraw();
 }
+/* 怪物回合执行完毕后调用：双方互不在攻击范围 → 战斗自动结束回到探索（与桌面版 MaybeEndBattleAfterMonsterTurn 一致），
+   避免残留战斗状态导致探索阶段 WASD 必须先点「移动」才能走 */
+function maybeEndBattleAfterMonsterTurn(){
+  if(!anyMonsterInPlayerRange()&&!anyMonsterCanAttackPlayer()) endBattle(false);
+}
 function enterBattle(monsterFirst){
   battle.active=true; battle.moving=false; battle.moveCount=0;
   if(monsterFirst){
     if(runMonsterTurn()){ playerDie(); return; }
+    maybeEndBattleAfterMonsterTurn();
   }
   redraw();
 }
@@ -1166,6 +1434,34 @@ function saveBackToMenu(){
 function doSkill(){
   if(battle.active){ battle.moving=false; battle.targeting=false; }
   var cls=save.characterId;
+  if(save.run3Transformed){
+    /* 三周目变身唯一技能「湮灭」：消耗 0 MP，对全场所有存活怪物造成 999 伤害（无视距离/隔墙/范围，直接击杀），
+       与桌面版 RUN3_SKILLS 一致 */
+    var n=0;
+    for(var ai=0;ai<save.monsters.length;ai++){
+      var am=save.monsters[ai];
+      if(am.alive){
+        am.hp-=999;
+        am.alive=false;
+        save.kills++;
+        save.levelKills++;
+        n++;
+      }
+    }
+    toast(n>0?('湮灭！全场 '+n+' 只怪物化为虚无'):'湮灭！没有可攻击的怪物');
+    if(n>0&&Math.floor(save.kills/10)>save.awarded){
+      rewardFromSkill=true; rewardPopup=true;
+      showReward();
+      redraw();
+      return;
+    }
+    if(!bossPreview) saveGame();
+    var allDead3=true;
+    for(var i3=0;i3<save.monsters.length;i3++) if(save.monsters[i3].alive){allDead3=false;break;}
+    if(allDead3){ endBattle(true); return; }
+    redraw();
+    return;
+  }
   if(cls===0){
     if(save.playerMp<2){ toast('MP 不足！'); redraw(); return; }
     save.playerMp-=2;
@@ -1192,6 +1488,12 @@ function doSkill(){
       t.hp-=dmg; hit++;
       if(t.hp<=0){
         t.alive=false; save.kills++;
+        /* 三周目变身：第三周目技能击杀第一只怪物触发（与桌面版 ReleaseSkill 一致） */
+        if(save.runCount===3&&!save.run3Transformed&&!bossPreview){
+          save.run3Transformed=true;
+          save.playerHp=999; save.playerMp=999; save.tempHP=0;
+          toast('三周目变身！你已觉醒为「湮灭」形态（全属性 999）');
+        }
         if(!bossPreview) saveGame();
         if(Math.floor(save.kills/10)>save.awarded){
           rewardFromSkill=true; rewardPopup=true;
@@ -1230,6 +1532,7 @@ function finishAttackTurn(){
   for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive){allDead=false;break;}
   if(allDead){ endBattle(true); return; }
   if(runMonsterTurn()){ playerDie(); return; }
+  maybeEndBattleAfterMonsterTurn();
   battle.moveCount=0; battle.moving=false; battle.targeting=false;
   if(!bossPreview) saveGame();
   redraw();
@@ -1253,6 +1556,12 @@ function attackMonster(target){
     target.alive=false;
     save.kills++;
     save.levelKills++;
+    /* 三周目变身：第三周目击杀第一只怪物（普攻）触发，数值置 999、tempHP 清 0（与桌面版 AttackMonster 一致） */
+    if(save.runCount===3&&!save.run3Transformed&&!bossPreview){
+      save.run3Transformed=true;
+      save.playerHp=999; save.playerMp=999; save.tempHP=0;
+      toast('三周目变身！你已觉醒为「湮灭」形态（全属性 999）');
+    }
     if(!bossPreview) saveGame();
     if(Math.floor(save.kills/10)>save.awarded){
       rewardFromSkill=false;
@@ -1269,6 +1578,10 @@ function chooseReward(choice){
   else if(choice===1){ save.atkBonus++; }
   else { save.mpBonus++; save.playerMp++; }
   save.awarded++;
+  /* 白纸生成时机：加点奖励发放次数达到 1/2/3/4/5/8/15/18 时各生成 1 张（序号 1~8，与桌面版 ChooseReward 一致） */
+  for(var pt=0;pt<PAPER_TRIGGER_AWARD.length;pt++){
+    if(save.awarded===PAPER_TRIGGER_AWARD[pt]) spawnWhitePaper(pt+1);
+  }
   rewardPopup=false;
   hideReward();
   if(!bossPreview) saveGame();
@@ -1341,6 +1654,7 @@ function handleBattleMove(dx,dy){
   }
   if(newlyEnteredMonsterRange(oldX,oldY)){
     if(runMonsterTurn()){ playerDie(); return; }
+    maybeEndBattleAfterMonsterTurn();
     battle.moveCount=0; battle.moving=false;
     if(!bossPreview) saveGame(); redraw();
     return;
@@ -1352,6 +1666,7 @@ function handleBattleMove(dx,dy){
   }
   if(battle.moveCount>=2){
     if(runMonsterTurn()){ playerDie(); return; }
+    maybeEndBattleAfterMonsterTurn();
     battle.moveCount=0; battle.moving=false;
     if(!bossPreview) saveGame(); redraw();
     return;
@@ -1371,7 +1686,17 @@ function saveGame(){
     playerMp:save.playerMp, tempHP:save.tempHP, archerBuff:save.archerBuff,
     levelKills:save.levelKills||0,
     mapGrid:save.mapGrid, start:save.start, end:save.end, monsters:save.monsters,
-    pickups:save.pickups||[]
+    pickups:save.pickups||[],
+    /* 桌面版新增字段：Boss 通关加成 / 多周目 / 三周目变身 / 白纸（与桌面版 SaveData 同义） */
+    bossCleared:save.bossCleared||0,
+    runCount:save.runCount||1,
+    usedCharacterIds:save.usedCharacterIds||[],
+    run3Transformed:!!save.run3Transformed,
+    whitePaperGen:save.whitePaperGen||[0,0,0,0,0,0,0,0,0],
+    whitePapersCollected:save.whitePapersCollected||[],
+    groundPapers:save.groundPapers||[],
+    bagGems:save.bagGems||0,
+    bagHearts:save.bagHearts||0
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(d)); hasSave=true; }catch(e){}
 }
@@ -1383,7 +1708,11 @@ function chooseChar(cls){
   save={
     characterId:cls, playerX:0, playerY:0, playerHp:0, playerDir:DIR.UP,
     clearCount:0, kills:0, awarded:0, hpBonus:0, atkBonus:0, mpBonus:0,
-    playerMp:0, tempHP:0, archerBuff:0, levelKills:0, mapGrid:[], start:{x:0,y:0}, end:{x:0,y:0}, monsters:[], pickups:[]
+    playerMp:0, tempHP:0, archerBuff:0, levelKills:0, mapGrid:[], start:{x:0,y:0}, end:{x:0,y:0}, monsters:[], pickups:[],
+    /* 桌面版新增字段默认值：新游戏清 Boss 加成/周目/变身/白纸（与桌面版一致） */
+    bossCleared:0, runCount:1, usedCharacterIds:[], run3Transformed:false,
+    whitePaperGen:[0,0,0,0,0,0,0,0,0], whitePapersCollected:[], groundPapers:[],
+    bagGems:0, bagHearts:0
   };
   var cs=playerStats();
   save.playerHp=cs.hp; save.playerMp=cs.mp;
@@ -1395,8 +1724,51 @@ function chooseChar(cls){
   rewardPopup=false;
   bossPreview=false; boss2Preview=false; boss3Preview=false; finalLevel=false;
   bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
+  runSelect=false;   /* 新游戏：非周目选角（首周目，桌面版一致） */
   saveGame();
   screen='playing';
+  redraw();
+}
+/* 周目选角确认（第二/三周目）：保留全部加点数值与背包物品（含白纸已拾取/已生成标记），
+   重置关卡进度（clearCount/bossCleared/levelKills/怪物），重新生成地图并从第 1 关开始下一周目；
+   未拾取白纸（groundPapers）在新地图重新落位（周边一格优先）。与桌面版选角分支一致 */
+function confirmRunSelect(cls){
+  if(!save) return;
+  var old=save;
+  var usedIds=old.usedCharacterIds||[]; usedIds.push(cls);
+  save={
+    characterId:cls,
+    playerX:0, playerY:0, playerHp:0, playerDir:DIR.UP,
+    clearCount:0, kills:0, awarded:0, hpBonus:old.hpBonus, atkBonus:old.atkBonus, mpBonus:old.mpBonus,
+    playerMp:0, tempHP:0, archerBuff:0, levelKills:0,
+    mapGrid:[], start:{x:0,y:0}, end:{x:0,y:0}, monsters:[], pickups:[],
+    /* 周目保留字段：白纸已生成标记/已拾取/地面未拾取跨周目保留；背包存量保留 */
+    bossCleared:0, runCount:(old.runCount||1)+1, usedCharacterIds:usedIds,
+    run3Transformed:old.run3Transformed||false,
+    whitePaperGen:old.whitePaperGen||[0,0,0,0,0,0,0,0,0],
+    whitePapersCollected:old.whitePapersCollected||[],
+    groundPapers:old.groundPapers||[],
+    bagGems:old.bagGems||0, bagHearts:old.bagHearts||0
+  };
+  var cs=playerStats();
+  /* 保留加点：属性 = 基础 + 加成 */
+  save.playerHp=cs.hp; save.playerMp=cs.mp;
+  mapGenerate();
+  save.playerX=save.start.x; save.playerY=save.start.y;
+  generateMonsters();
+  /* 清空普通微粒；未拾取白纸在新地图重新落位 */
+  save.pickups=[];
+  relayoutGroundPapers();
+  battle={active:false,moving:false,targeting:false,moveCount:0};
+  effects=[];
+  rewardPopup=false;
+  bossPreview=false; boss2Preview=false; boss3Preview=false; finalLevel=false;
+  bossRoomActive=false; bossExitOpen=false; bossMoveCounter=0;
+  runSelect=false;   /* 本次周目选角完成，恢复普通流程 */
+  screen='playing';
+  saveGame();   /* 周目进度立即落盘 */
+  hasSave=true;
+  toast('第 '+(save.runCount)+' 周目开始！');
   redraw();
 }
 function loadGame(){
@@ -1409,7 +1781,12 @@ function loadGame(){
       playerDir:d.playerDir, clearCount:d.clearCount, kills:d.kills, awarded:d.awarded,
       hpBonus:d.hpBonus, atkBonus:d.atkBonus, mpBonus:d.mpBonus, playerMp:d.playerMp,
       tempHP:d.tempHP, archerBuff:d.archerBuff, levelKills:d.levelKills||0, mapGrid:d.mapGrid,
-      start:d.start, end:d.end, monsters:d.monsters||[], pickups:d.pickups||[]};
+      start:d.start, end:d.end, monsters:d.monsters||[], pickups:d.pickups||[],
+      /* 桌面版新增字段：旧档缺失时取默认值（兼容旧存档，与桌面版 Load 默认一致） */
+      bossCleared:d.bossCleared||0, runCount:d.runCount||1, usedCharacterIds:d.usedCharacterIds||[],
+      run3Transformed:!!d.run3Transformed, whitePaperGen:d.whitePaperGen||[0,0,0,0,0,0,0,0,0],
+      whitePapersCollected:d.whitePapersCollected||[], groundPapers:d.groundPapers||[],
+      bagGems:d.bagGems||0, bagHearts:d.bagHearts||0};
   }catch(e){ return false; }
   if(!save.mapGrid||save.mapGrid.length!==SIZE*SIZE) return false;
   var pcs=playerStats();
@@ -1421,20 +1798,23 @@ function loadGame(){
   if(save.levelKills<0) save.levelKills=0;
   for(var i=0;i<save.monsters.length;i++){
     var m=save.monsters[i];
-    if(m.isBoss&&m.type===BOSS_TYPE){ m.hp=Math.min(25,m.hp); m.atk=7; m.maxhp=25; continue; }
-    if(m.isBoss2&&m.type===BOSS2_TYPE){ m.hp=Math.min(25,m.hp); m.atk=10; m.maxhp=25; continue; }
+    if(m.isBoss&&m.type===BOSS_TYPE){ m.hp=Math.min(25+save.bossCleared,m.hp); m.atk=7+save.bossCleared; m.maxhp=25+save.bossCleared; continue; }
+    if(m.isBoss2&&m.type===BOSS2_TYPE){ m.hp=Math.min(25+save.bossCleared,m.hp); m.atk=10+save.bossCleared; m.maxhp=25+save.bossCleared; continue; }
     if(m.isBoss3&&m.type===BOSS3_TYPE){
-      m.hp=Math.min(25,m.hp); m.atk=10; m.maxhp=25;
+      m.hp=Math.min(25+save.bossCleared,m.hp); m.atk=10+save.bossCleared; m.maxhp=25+save.bossCleared;
       if(!m.elementCells||!m.elementCells.length) rollBoss3Elements(m);
       if(typeof m.nearDir!=='number') m.nearDir=0;
       if(typeof m.teleportSkip!=='boolean') m.teleportSkip=false;
       continue;
     }
     var mcs=classStats(m.type);
-    var growth=Math.floor(save.clearCount/3);
-    if(m.hp<=0||m.hp>mcs.hp+growth||m.atk<=0||m.atk>Math.ceil(mcs.atk/2)+growth){
+    var growth=monsterGrowthTimes(save.clearCount);
+    if(m.hp<=0||m.hp>mcs.hp+growth+save.bossCleared||m.atk<=0||m.atk>Math.ceil(mcs.atk/2)+growth+save.bossCleared){
       m.hp=mcs.hp; m.atk=Math.ceil(mcs.atk/2);
       applyMonsterGrowth(m,save.clearCount);
+      /* Boss 通关加成：重建后全属性 +bossCleared（与桌面版 Load 一致） */
+      m.hp+=save.bossCleared;
+      m.atk+=save.bossCleared;
     }
     m.maxhp=m.hp;
   }
@@ -1447,6 +1827,7 @@ function loadGame(){
   }
   battle={active:false,moving:false,targeting:false,moveCount:0};
   bossPreview=false; boss2Preview=false; boss3Preview=false; finalLevel=false;
+  runSelect=false;   /* 继续游戏：非周目选角状态（桌面版一致） */
   screen='playing';
   redraw();
   return true;
@@ -1551,7 +1932,8 @@ function drawMap(){
 }
 function drawPlayer(){
   var sprite=SPRITES[save.characterId];
-  var pal=(Date.now()<playerHitUntil)?PALETTE_RED:PALETTE;
+  /* 三周目变身角色变黄；红窗口期仍优先变红（与桌面版一致） */
+  var pal=(Date.now()<playerHitUntil)?PALETTE_RED:(save.run3Transformed?PALETTE_YELLOW:PALETTE);
   drawSprite(sprite,save.playerX*CELL,save.playerY*CELL,1,pal);
   if(battle.active) drawSpriteBorder(save.playerX*CELL,save.playerY*CELL,25,'rgb(255,220,60)');
 }
@@ -1595,10 +1977,18 @@ function drawBossInfo(m){
   ctx.fillStyle='rgb(255,255,255)';
   ctx.fillText(s,tx+CELL/2,textY);
 }
-/* 微粒：蓝菱 +1MP / 红心 +2HP（与桌面版 BLUE_GEM/RED_HEART 一致） */
+/* 微粒：蓝菱 +1MP / 红心 +2HP / 白纸 kind=5（与桌面版 BLUE_GEM/RED_HEART/WHITE_PAPER 一致） */
 function drawPickups(){
   for(var i=0;i<save.pickups.length;i++){
     var p=save.pickups[i];
+    if(p.kind===5){
+      /* 白纸：纯白纸面+浅灰横线+折角像素造型，格内下方标注序号 1~9（与桌面版一致） */
+      drawSprite(WHITE_PAPER,p.x*CELL,p.y*CELL,1,PICKUP_WHITE);
+      ctx.font='bold 9px Courier New'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle='rgb(80,80,90)';
+      ctx.fillText(String(p.index),p.x*CELL+CELL/2,p.y*CELL+CELL-7);
+      continue;
+    }
     var spr=(p.kind===1)?RED_HEART:BLUE_GEM;
     var pal=(p.kind===1)?PICKUP_RED:PICKUP_BLUE;
     drawSprite(spr,p.x*CELL,p.y*CELL,1,pal);
@@ -1716,6 +2106,11 @@ function drawPlaying(){
   drawMonsters();
   drawEffects();
   drawAttackRanges();
+  /* 周目白屏过渡：整屏纯白覆盖（输入已被事件层锁定，到期自动切换界面） */
+  if(whiteFlash){
+    ctx.fillStyle='rgb(255,255,255)';
+    ctx.fillRect(0,0,MAP_PX,MAP_PX);
+  }
 }
 
 /* ============ DOM 更新 ============ */
@@ -1729,7 +2124,8 @@ function updateTop(){
   document.getElementById('stat-hp').textContent=s;
   var alive=0;
   for(var i=0;i<save.monsters.length;i++) if(save.monsters[i].alive) alive++;
-  var l1='角色: '+CHAR_NAMES[save.characterId]+'  通关: '+save.clearCount+'  怪物: '+alive;
+  var l1='角色: '+CHAR_NAMES[save.characterId]+'  ['+(save.runCount||1)+'周目]  通关: '+save.clearCount+'  怪物: '+alive;
+  if(save.run3Transformed) l1+='  [变 999]';
   if(battle.active) l1+='  [战斗中]';
   if(bossPreview&&boss3Preview) l1+='  [Boss3预览]';
   else if(bossPreview&&boss2Preview) l1+='  [Boss2预览]';
@@ -1792,13 +2188,21 @@ function updateSelectCards(){
     var cv=cards[i].querySelector('canvas');
     var c2=cv.getContext('2d');
     var spr=SPRITES[i];
+    /* 周目选角：历史已用角色灰卡（PALETTE_GRAY），未用角色保持原色（与桌面版一致） */
+    var used=false;
+    if(runSelect&&save){
+      var ids=save.usedCharacterIds||[];
+      for(var ui=0;ui<ids.length;ui++){ if(ids[ui]===i){ used=true; break; } }
+    }
+    var pal=(used)?PALETTE_GRAY:PALETTE;
+    cards[i].className='card'+(used?' used':'');
     var scale=8; // 200px
     c2.fillStyle='rgb(20,24,32)'; c2.fillRect(0,0,200,200);
     var ox=(200-25*scale)/2, oy=(200-25*scale)/2;
     for(var sy=0;sy<25;sy++){
       for(var sx=0;sx<25;sx++){
         var idx=spr[sy][sx]; if(idx===0) continue;
-        var col=PALETTE[idx];
+        var col=pal[idx];
         c2.fillStyle='rgb('+col[0]+','+col[1]+','+col[2]+')';
         c2.fillRect(ox+sx*scale,oy+sy*scale,scale,scale);
       }
@@ -1816,7 +2220,12 @@ function redraw(){
   var screens=document.querySelectorAll('.screen');
   for(var i=0;i<screens.length;i++) screens[i].classList.remove('active');
   if(screen==='menu'){ document.getElementById('screen-menu').classList.add('active'); }
-  else if(screen==='select'){ document.getElementById('screen-select').classList.add('active'); }
+  else if(screen==='select'){
+    document.getElementById('screen-select').classList.add('active');
+    /* 周目选角标题：显示当前周目（桌面版 DrawSelectScreen） */
+    document.getElementById('select-title').textContent=(runSelect&&save&&save.runCount)?('选择你的角色（第 '+(save.runCount)+' 周目）'):'选择你的角色';
+    updateSelectCards();
+  }
   else{
     document.getElementById('screen-playing').classList.add('active');
     updateBattleUI();
@@ -1851,6 +2260,91 @@ function updateMonsterBars(){
   else{ box.style.display='block'; box.innerHTML=rows.join(''); }
 }
 
+/* ============ 背包 / 白纸收藏页 ============ */
+function toggleBag(){
+  if(!save||screen!=='playing') return;
+  if(bagOpen){ closeBag(); }else{ openBag(); }
+}
+function openBag(){
+  bagOpen=true;
+  bagWhitePaperView=false;
+  renderBag();
+  document.getElementById('bag-modal').classList.add('active');
+}
+function closeBag(){
+  bagOpen=false;
+  bagWhitePaperView=false;
+  document.getElementById('bag-modal').classList.remove('active');
+}
+function openBagWhitePaper(){
+  bagWhitePaperView=true;
+  renderBag();
+}
+function renderBag(){
+  if(!save) return;
+  var title=document.getElementById('bag-title');
+  var body=document.getElementById('bag-body');
+  var btns=document.getElementById('bag-btns');
+  if(bagWhitePaperView){
+    /* ---- 白纸收藏页：已拾取白纸内容全文 + 未拾取数量 + 返回按钮（与桌面版 DrawBagOverlay 一致） ---- */
+    title.textContent='白纸收藏（E / Esc 返回背包）';
+    var collected=save.whitePapersCollected||[];
+    var uncollected=9-(collected.length);
+    var h='<div id="bag-uncollected">未拾取白纸：'+uncollected+' 张</div>';
+    h+='<div id="bag-paper-list">';
+    if(collected.length===0){
+      h+='<div id="bag-empty-note">尚未拾取任何白纸（加点或击败第 3 个 Boss 后生成）</div>';
+    }else{
+      for(var ci=0;ci<collected.length;ci++){
+        var idx=collected[ci];
+        h+='<div class="bag-paper-item"><b>白纸 '+idx+'</b><br>'+WHITE_PAPER_CONTENTS[idx-1]+'</div>';
+      }
+    }
+    h+='</div>';
+    body.innerHTML=h;
+    btns.innerHTML='<button onclick="openBag()">返回背包</button><button onclick="closeBag()">关闭背包</button>';
+  }else{
+    /* ---- 主视图：红心/蓝菱存量、白纸入口（与桌面版一致） ---- */
+    title.textContent='背包（E / Esc 关闭）';
+    var h2='';
+    h2+='<div class="bag-row"><div class="bag-desc"><b>红色微粒（红心）</b>：存量 '+((save.bagHearts||0))+' / 3</div>'
+      +'<div class="bag-act"><button onclick="useBagHeart()">使用</button></div></div>';
+    h2+='<div class="bag-row"><div class="bag-desc"><b>蓝色微粒（蓝菱）</b>：存量 '+((save.bagGems||0))+' / 10</div>'
+      +'<div class="bag-act"><button onclick="useBagGem()">使用</button></div></div>';
+    var pc=((save.whitePapersCollected||[]).length);
+    h2+='<div class="bag-row"><div class="bag-desc"><b>白纸</b>：已拾取 '+pc+' 张 <span class="used-tag">（点击下方按钮进入收藏页查看内容）</span></div>'
+      +'<div class="bag-act"><button onclick="openBagWhitePaper()">白纸</button></div></div>';
+    body.innerHTML=h2;
+    btns.innerHTML='<button onclick="closeBag()">关闭背包</button>';
+  }
+}
+function useBagHeart(){
+  if(!save) return;
+  if((save.bagHearts||0)<=0){ toast('没有红色微粒！'); return; }
+  var pcs=playerStats();
+  if(save.playerHp>=pcs.hp){ toast('HP 已满！'); return; }
+  save.bagHearts--;
+  save.playerHp+=2; if(save.playerHp>pcs.hp) save.playerHp=pcs.hp;
+  toast('使用红色微粒：HP+2');
+  saveGame();
+  updateTop();
+  renderBag();
+  redraw();
+}
+function useBagGem(){
+  if(!save) return;
+  if((save.bagGems||0)<=0){ toast('没有蓝色微粒！'); return; }
+  var pcs=playerStats();
+  if(save.playerMp>=pcs.mp){ toast('MP 已满！'); return; }
+  save.bagGems--;
+  save.playerMp+=1; if(save.playerMp>pcs.mp) save.playerMp=pcs.mp;
+  toast('使用蓝色微粒：MP+1');
+  saveGame();
+  updateTop();
+  renderBag();
+  redraw();
+}
+
 /* ============ 事件 ============ */
 function bind(id,fn){ document.getElementById(id).addEventListener('click',fn); }
 bind('btn-new',function(){ newGame(); });
@@ -1860,10 +2354,10 @@ bind('btn-menu',function(){ saveBackToMenu(); });
 bind('btn-boss',function(){ if(!save) save={characterId:0}; startBossPreview(false,false); });
 bind('btn-boss2',function(){ if(!save) save={characterId:0}; startBossPreview(true,false); });
 bind('btn-boss3',function(){ if(!save) save={characterId:0}; startBossPreview(false,true); });
-bind('bm-attack',function(){ if(rewardPopup)return; doAttack(); });
-bind('bm-move',function(){ if(rewardPopup)return; doMove(); });
-bind('bm-skill',function(){ if(rewardPopup)return; doSkill(); });
-bind('bm-bag',function(){ if(rewardPopup)return; toast('背包暂未开放！'); });
+bind('bm-attack',function(){ if(rewardPopup||whiteFlash)return; doAttack(); });
+bind('bm-move',function(){ if(rewardPopup||whiteFlash)return; doMove(); });
+bind('bm-skill',function(){ if(rewardPopup||whiteFlash)return; doSkill(); });
+bind('bm-bag',function(){ if(rewardPopup||whiteFlash)return; toggleBag(); });
 bind('rw-hp',function(){ chooseReward(0); });
 bind('rw-atk',function(){ chooseReward(1); });
 bind('rw-mp',function(){ chooseReward(2); });
@@ -1872,14 +2366,28 @@ bind('btn-q',function(){ if(rewardPopup||screen!=='playing')return; doSkill(); }
 var cards=document.querySelectorAll('.card');
 for(var ci=0;ci<cards.length;ci++){
   (function(cls){
-    cards[ci].addEventListener('click',function(){ chooseChar(cls); });
+    cards[ci].addEventListener('click',function(){
+      if(runSelect){
+        /* 周目选角：历史已选角色灰色不可选（点击忽略）；未用角色确认后开启下一周目 */
+        var used=false;
+        var ids=save.usedCharacterIds||[];
+        for(var ui=0;ui<ids.length;ui++){ if(ids[ui]===cls){ used=true; break; } }
+        if(used){
+          toast('该角色已在之前周目使用过！');
+          return;
+        }
+        confirmRunSelect(cls);
+        return;
+      }
+      chooseChar(cls);
+    });
   })(ci);
 }
 var dbtns=document.querySelectorAll('.dbtn');
 for(var bi=0;bi<dbtns.length;bi++){
   (function(btn){
     btn.addEventListener('click',function(){
-      if(rewardPopup||screen!=='playing') return;
+      if(rewardPopup||whiteFlash||screen!=='playing') return;
       var dx=parseInt(btn.getAttribute('data-dx'),10);
       var dy=parseInt(btn.getAttribute('data-dy'),10);
       if(battle.active&&battle.moving) handleBattleMove(dx,dy);
@@ -1889,7 +2397,7 @@ for(var bi=0;bi<dbtns.length;bi++){
 }
 
 game.addEventListener('click',function(e){
-  if(rewardPopup||screen!=='playing') return;
+  if(rewardPopup||whiteFlash||screen!=='playing') return;
   if(!battle.active||!battle.targeting) return;
   var r=game.getBoundingClientRect();
   var x=(e.clientX-r.left)/r.width*MAP_PX;
@@ -1912,13 +2420,21 @@ game.addEventListener('click',function(e){
 
 window.addEventListener('keydown',function(e){
   if(rewardPopup) return;
+  if(whiteFlash) return;   /* 周目白屏过渡：锁定全部输入（桌面版 g_whiteFlash） */
   var k=e.key;
+  if(screen==='playing'&&bagOpen){
+    /* 背包打开：E/Esc 关闭或返回，忽略其它游戏按键 */
+    if(k==='Escape'){ if(bagWhitePaperView){ bagWhitePaperView=false; renderBag(); } else { closeBag(); } }
+    else if(k==='e'||k==='E'){ closeBag(); }
+    return;
+  }
   var up=(k==='w'||k==='W'||k==='ArrowUp');
   var down=(k==='s'||k==='S'||k==='ArrowDown');
   var left=(k==='a'||k==='A'||k==='ArrowLeft');
   var right=(k==='d'||k==='D'||k==='ArrowRight');
   var q=(k==='q'||k==='Q');
   if(screen!=='playing') return;
+  if(k==='e'||k==='E'){ toggleBag(); return; }
   if(k==='Escape'){ saveBackToMenu(); return; }
   if(q){ doSkill(); return; }
   if(battle.active&&battle.moving){
