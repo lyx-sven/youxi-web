@@ -60,6 +60,8 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
 .dbtn:active{background:#2b4470}
 #btn-q{width:96px;height:96px;border-radius:50%;background:#8c3c3c;color:#fff;font-size:20px;border:none;cursor:pointer;font-family:inherit;font-weight:bold}
 #btn-q:active{background:#b04c4c}
+#btn-b{width:96px;height:96px;border-radius:50%;background:#3c7a4c;color:#fff;font-size:20px;border:none;cursor:pointer;font-family:inherit;font-weight:bold}
+#btn-b:active{background:#4c9a5c}
 #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0c0c12;color:#ffe650;font-size:24px;padding:12px 26px;z-index:50;display:none;border:2px solid #ffe650;text-align:center;max-width:82%;letter-spacing:1px}
 .modal{position:fixed;inset:0;background:rgba(10,10,18,.88);display:none;align-items:center;justify-content:center;z-index:100}
 .modal.active{display:flex}
@@ -140,6 +142,7 @@ body{background:#1c202c;color:#eef;font-family:'Courier New',Courier,monospace;o
         <button class="dbtn right" data-dx="1" data-dy="0">▶</button>
       </div>
       <button id="btn-q">Q<br>技能</button>
+      <button id="btn-b">B<br>背包</button>
     </div>
   </div>
 
@@ -1857,8 +1860,8 @@ function drawSpriteBorder(px,py,size,color){
 }
 function drawRangeGridCell(gx,gy,fill,border){
   var px=gx*CELL, py=gy*CELL;
-  // 半透明色底块：与桌面版 AlphaBlend 约 35% 不透明度一致
-  ctx.globalAlpha=0.35;
+  // 半透明色底块：与桌面版 AlphaBlend 约 25% 不透明度一致（比原 0.35 更透）
+  ctx.globalAlpha=0.25;
   ctx.fillStyle=fill;
   ctx.fillRect(px,py,CELL,CELL);
   ctx.globalAlpha=1;
@@ -1889,24 +1892,22 @@ function drawMap(){
       if(gridAt(x,y)===1){
         ctx.fillStyle='rgb(8,6,8)'; ctx.fillRect(px,py,CELL,CELL);            // 砖缝黑底
         ctx.fillStyle='rgb(122,28,26)';                                        // 暗红砖块
-        // 层1：两砖错缝
-        ctx.fillRect(px+1,py+1,10,7);
-        ctx.fillRect(px+13,py+1,11,7);
-        // 层2：三砖半错
-        ctx.fillRect(px+1,py+8,4,7);
-        ctx.fillRect(px+6,py+8,12,7);
-        ctx.fillRect(px+19,py+8,5,7);
-        // 层3：两砖，与层1同缝
-        ctx.fillRect(px+1,py+15,10,9);
-        ctx.fillRect(px+13,py+15,11,9);
+        // 层 1/3（两块砖，中间留 2px 缝）；层 2（三块砖，半砖错缝）——与桌面版 DrawMap 完全一致
+        ctx.fillRect(px+1,py+1,18,13);
+        ctx.fillRect(px+21,py+1,19,13);
+        ctx.fillRect(px+1,py+14,8,13);
+        ctx.fillRect(px+11,py+14,19,13);
+        ctx.fillRect(px+32,py+14,8,13);
+        ctx.fillRect(px+1,py+27,18,14);
+        ctx.fillRect(px+21,py+27,19,14);
       }else{
         ctx.fillStyle='rgb(24,18,22)'; ctx.fillRect(px,py,CELL,CELL);          // 深黑灰底
         ctx.fillStyle='rgb(98,28,26)';                                          // 暗红点缀
         if((x+y)%2===0){
-          ctx.fillRect(px+4,py+4,2,2);
-          ctx.fillRect(px+19,py+19,2,2);
+          ctx.fillRect(px+6,py+6,3,3);                                         // 左上一小点
+          ctx.fillRect(px+32,py+32,3,3);                                       // 右下一小点
         }else{
-          ctx.fillRect(px+10,py+12,6,1);
+          ctx.fillRect(px+17,py+19,7,2);                                       // 中央一短横线
         }
       }
     }
@@ -1992,6 +1993,77 @@ function drawPickups(){
     var spr=(p.kind===1)?RED_HEART:BLUE_GEM;
     var pal=(p.kind===1)?PICKUP_RED:PICKUP_BLUE;
     drawSprite(spr,p.x*CELL,p.y*CELL,1,pal);
+  }
+}
+/* 怪物下一步位置虚影：预测每只存活怪物的下一步移动格（预测逻辑与 moveMonstersTowardPlayer 一致：
+   BFS 最短路 + 可走方向候选，虚影取最短路方向），在该格绘制高透明造型副本（每像素 alpha 0.16，
+   比攻击范围 0.25 更透，形成显著虚影）；玩家在攻击范围且无墙（含 Boss 特例）时本回合攻击不移动
+   → 不显示虚影；四方向被包围原地不动 → 不显示虚影。绘制在地图/拾取物之上、怪物本体之下
+   （与桌面版 DrawMonsterGhosts 一致） */
+function drawMonsterGhosts(){
+  var INF=1<<29;
+  var dist=[]; for(var yy=0;yy<SIZE;yy++){ dist.push([]); for(var xx=0;xx<SIZE;xx++) dist[yy].push(INF); }
+  var q=[], qh=0;
+  dist[save.playerY][save.playerX]=0; q.push([save.playerX,save.playerY]);
+  while(qh<q.length){
+    var cur=q[qh++], cx=cur[0], cy=cur[1];
+    var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+    for(var di=0;di<4;di++){
+      var nx=cx+dirs[di][0], ny=cy+dirs[di][1];
+      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
+      if(gridAt(nx,ny)===1) continue;
+      if(dist[ny][nx]!==INF) continue;
+      dist[ny][nx]=dist[cy][cx]+1; q.push([nx,ny]);
+    }
+  }
+  var dirs4=[[1,0],[-1,0],[0,1],[0,-1]];
+  for(var i=0;i<save.monsters.length;i++){
+    var m=save.monsters[i]; if(!m.alive) continue;
+    /* 攻击判定（与 runMonsterTurn 一致）：玩家在范围且无墙 → 攻击不移动 → 不显示虚影 */
+    var willAttack=false;
+    if(m.isBoss2&&m.type===BOSS2_TYPE){
+      willAttack=boss2InFullRange(m,save.playerX,save.playerY)&&hasClearPath(m.x,m.y,save.playerX,save.playerY);
+    }else if(m.isBoss&&m.type===BOSS_TYPE){
+      willAttack=inAttackRange(m.type,m.x,m.y,m.dir,save.playerX,save.playerY)&&hasClearPath(m.x,m.y,save.playerX,save.playerY);
+    }else if(m.isBoss3&&m.type===BOSS3_TYPE){
+      if(m.teleportSkip) continue;   /* 受击传送后休息一轮（不移动不攻击），不显示虚影 */
+      willAttack=boss3HitsAt(m,save.playerX,save.playerY)&&hasClearPath(m.x,m.y,save.playerX,save.playerY);
+    }else{
+      willAttack=inAttackRange(m.type,m.x,m.y,m.dir,save.playerX,save.playerY)&&hasClearPath(m.x,m.y,save.playerX,save.playerY);
+    }
+    if(willAttack) continue;
+    var bestCands=[], bestDist=INF;
+    for(var d=0;d<4;d++){
+      var nx=m.x+dirs4[d][0], ny=m.y+dirs4[d][1];
+      if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) continue;
+      if(gridAt(nx,ny)===1) continue;
+      if(nx===save.playerX&&ny===save.playerY) continue;
+      var occ=false;
+      for(var j=0;j<save.monsters.length;j++){
+        var o=save.monsters[j];
+        if(!o.alive||o===m) continue;
+        if(o.x===nx&&o.y===ny){ occ=true; break; }
+      }
+      if(occ) continue;
+      if(dist[ny][nx]<bestDist){ bestDist=dist[ny][nx]; bestCands.length=0; }
+      if(dist[ny][nx]===bestDist&&bestDist<INF) bestCands.push([dirs4[d][0],dirs4[d][1]]);
+    }
+    if(bestCands.length===0) continue;   /* 四方向都不可动 → 原地不动，不显示虚影 */
+    var gx=m.x+bestCands[0][0], gy=m.y+bestCands[0][1];
+    var sprite, pal;
+    if(m.isBoss&&m.type===BOSS_TYPE){ sprite=BOSS; pal=PALETTE_BOSS; }
+    else if(m.isBoss2&&m.type===BOSS2_TYPE){ sprite=BOSS2; pal=PALETTE_BOSS2; }
+    else if(m.isBoss3&&m.type===BOSS3_TYPE){ sprite=BOSS3; pal=PALETTE_BOSS3; }
+    else { sprite=SPRITES[m.type]; pal=PALETTE_RED; }
+    /* 高透明造型副本：每像素 rgba alpha 0.16（比攻击范围 0.25 更透，形成显著虚影） */
+    for(var sy=0;sy<25;sy++){
+      for(var sx=0;sx<25;sx++){
+        var idx=sprite[sy][sx]; if(idx===0) continue;
+        var c=pal[idx];
+        ctx.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+',0.16)';
+        ctx.fillRect(gx*CELL+sx,gy*CELL+sy,1,1);
+      }
+    }
   }
 }
 function drawAttackRanges(){
@@ -2103,6 +2175,7 @@ function drawPlaying(){
   drawMap();
   drawPlayer();
   drawPickups();
+  drawMonsterGhosts();   /* 怪物下一步虚影：地图/拾取物之上、怪物本体之下（与桌面版一致） */
   drawMonsters();
   drawEffects();
   drawAttackRanges();
@@ -2362,6 +2435,7 @@ bind('rw-hp',function(){ chooseReward(0); });
 bind('rw-atk',function(){ chooseReward(1); });
 bind('rw-mp',function(){ chooseReward(2); });
 bind('btn-q',function(){ if(rewardPopup||screen!=='playing')return; doSkill(); });
+bind('btn-b',function(){ if(rewardPopup||whiteFlash)return; toggleBag(); });
 
 var cards=document.querySelectorAll('.card');
 for(var ci=0;ci<cards.length;ci++){
@@ -2435,6 +2509,7 @@ window.addEventListener('keydown',function(e){
   var q=(k==='q'||k==='Q');
   if(screen!=='playing') return;
   if(k==='e'||k==='E'){ toggleBag(); return; }
+  if(k==='b'||k==='B'){ toggleBag(); return; }
   if(k==='Escape'){ saveBackToMenu(); return; }
   if(q){ doSkill(); return; }
   if(battle.active&&battle.moving){
